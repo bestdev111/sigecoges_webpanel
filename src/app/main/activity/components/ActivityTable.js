@@ -101,6 +101,7 @@ function ActivityTable(props) {
       </motion.div>
     );
   }
+  console.log('=====>>>', data);
   return (
     <div className="w-full flex flex-col">
       <FuseScrollbars className="flex-grow overflow-x-auto">
@@ -200,7 +201,7 @@ function ActivityTable(props) {
       <TablePagination
         className="flex-shrink-0 border-t-1"
         component="div"
-        count={data.length}
+        count={data ? data.length : 0}
         rowsPerPage={rowsPerPage}
         page={page}
         backIconButtonProps={{
