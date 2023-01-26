@@ -1,18 +1,11 @@
+import { useState, useCallback, useEffect } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import formatISO from 'date-fns/formatISO';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import FuseUtils from '@fuse/utils/FuseUtils';
-import AppBar from '@material-ui/core/AppBar';
-import Dialog from '@material-ui/core/Dialog';
-import DialogContent from '@material-ui/core/DialogContent';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Switch from '@material-ui/core/Switch';
-import TextField from '@material-ui/core/TextField';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import { DateTimePicker } from '@material-ui/pickers';
-import { useCallback, useEffect } from 'react';
+import { AppBar, Avatar, Dialog, DialogContent, Toolbar, Typography } from '@material-ui/core';
 import { useDispatch, useSelector } from 'react-redux';
+import FuseLoading from '@fuse/core/FuseLoading';
 import * as yup from 'yup';
 import {
   removeEvent,
@@ -21,6 +14,7 @@ import {
   closeNewEventDialog,
   closeEditEventDialog,
 } from '../store/agendaSlice';
+import { selectUsers, getUsers } from '../store/usersSlice';
 
 const defaultValues = {
   id: FuseUtils.generateGUID(),
@@ -40,14 +34,18 @@ const schema = yup.object().shape({
 
 function EventDialog(props) {
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(true);
   const eventDialog = useSelector(({ Agenda }) => Agenda.events.eventDialog);
+  const users = useSelector(selectUsers);
 
   const { reset, formState, watch, control, getValues, handleSubmit } = useForm({
     defaultValues,
     mode: 'onChange',
     resolver: yupResolver(schema),
   });
-
+  useEffect(() => {
+    dispatch(getUsers()).then(() => setLoading(false));
+  }, []);
   const { isValid, dirtyFields, errors } = formState;
 
   const start = watch('start');
@@ -114,7 +112,9 @@ function EventDialog(props) {
     dispatch(removeEvent(id));
     closeComposeDialog();
   }
-
+  if (loading) {
+    return <FuseLoading />;
+  }
   return (
     <Dialog
       {...eventDialog.props}
@@ -126,131 +126,41 @@ function EventDialog(props) {
       <AppBar position="static" elevation={0}>
         <Toolbar className="flex w-full">
           <Typography variant="subtitle1" color="inherit">
-            Event
+            Agenda
             {/* {eventDialog.type === 'new' ? 'New Event' : 'Edit Event'} */}
           </Typography>
         </Toolbar>
       </AppBar>
-
       <form noValidate onSubmit={handleSubmit(onSubmit)}>
         <DialogContent classes={{ root: 'p-16 pb-0 sm:p-24 sm:pb-0' }}>
-          <Controller
-            name="title"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                id="title"
-                label="Title"
-                className="mt-8 mb-16"
-                error={!!errors.title}
-                helperText={errors?.title?.message}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-                variant="outlined"
-                autoFocus
-                required
-                fullWidth
-              />
-            )}
-          />
-
-          <Controller
-            name="allDay"
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <FormControlLabel
-                className="mt-8 mb-16"
-                label="All Day"
-                control={
-                  <Switch
-                    onChange={(ev) => {
-                      onChange(ev.target.checked);
-                    }}
-                    checked={value}
-                    name="allDay"
-                  />
-                }
-              />
-            )}
-          />
-
-          <Controller
-            name="start"
-            control={control}
-            defaultValue=""
-            render={({ field: { onChange, value } }) => (
-              <DateTimePicker
-                label="Start"
-                inputVariant="outlined"
-                value={value}
-                className="mt-8 mb-16 w-full"
-                maxDate={end}
-              />
-            )}
-          />
-
-          <Controller
-            name="end"
-            control={control}
-            defaultValue=""
-            render={({ field: { onChange, value } }) => (
-              <DateTimePicker
-                label="End"
-                inputVariant="outlined"
-                value={value}
-                className="mt-8 mb-16 w-full"
-                minDate={start}
-              />
-            )}
-          />
-
-          {/* <Controller
-            name="extendedProps.desc"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                className="mt-8 mb-16"
-                id="desc"
-                label="Description"
-                type="text"
-                multiline
-                rows={5}
-                variant="outlined"
-                fullWidth
-              />
-            )}
-          /> */}
+          <Typography id="title" className="mt-8 mb-16">
+            {'Title : '}
+            {eventDialog && eventDialog.data ? eventDialog.data.title : ''}
+          </Typography>
+          <Typography id="Date" className="mt-8 mb-16">
+            {'Date : '}
+            {eventDialog && eventDialog.data ? eventDialog.data.extendedProps.d : ''}
+          </Typography>
+          <div className="flex">
+            <Typography id="Users" className="flex items-center mt-8 mb-16">
+              {'Who : '}
+            </Typography>
+            <div id="Users" className="mt-8 mb-16">
+              {eventDialog && eventDialog.data && users && users[0] !== undefined
+                ? users[0].map((user, index) => {
+                    if (eventDialog.data.extendedProps.uid === user.id) {
+                      return (
+                        <div key={index} className="flex">
+                          <Avatar className="ml-5" src={user.photo} />
+                          <p className="flex items-center ml-5">{user.name}</p>
+                        </div>
+                      );
+                    }
+                  })
+                : ''}
+            </div>
+          </div>
         </DialogContent>
-
-        {/* {eventDialog.type === 'new' ? (
-          <DialogActions className="justify-between px-8 sm:px-16 pb-16">
-            <Button
-              variant="contained"
-              color="primary"
-              type="submit"
-              disabled={_.isEmpty(dirtyFields) || !isValid}
-            >
-              Add
-            </Button>
-          </DialogActions>
-        ) : (
-          <DialogActions className="justify-between px-8 sm:px-16 pb-16">
-            <Button
-              variant="contained"
-              color="primary"
-              type="submit"
-              disabled={_.isEmpty(dirtyFields) || !isValid}
-            >
-              Save
-            </Button>
-            <IconButton onClick={handleRemove}>
-              <Icon>delete</Icon>
-            </IconButton>
-          </DialogActions>
-        )} */}
       </form>
     </Dialog>
   );

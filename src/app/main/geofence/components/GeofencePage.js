@@ -10,8 +10,12 @@ import { selectWidgetsEntities, getWidgets } from '../store/widgetsSlice';
 import { selectUsers, getUsers } from '../store/usersSlice';
 
 const useStyles = makeStyles((theme) => ({
-  customSize: {
+  customSize1: {
     width: 'calc(100vw - 312px)',
+    height: 'calc(100vh - 115px)',
+  },
+  customSize2: {
+    width: 'calc(100vw)',
     height: 'calc(100vh - 115px)',
   },
 }));
@@ -26,17 +30,27 @@ const GeofencePage = (props) => {
   const dispatch = useDispatch();
   const widgets = useSelector(selectWidgetsEntities);
   const users = useSelector(selectUsers);
+  const navbarToggle = useSelector(({ fuse }) => fuse.navbar.navbarToggle);
+  const navbarToggleFolded = useSelector(({ fuse }) => fuse.navbar.navbarToggleFolded);
 
   useEffect(() => {
     dispatch(getWidgets());
     dispatch(getUsers());
   }, []);
+  useEffect(() => {
+    console.log(navbarToggleFolded);
+  }, [navbarToggleFolded]);
+  console.log('navbarToggleFolded', navbarToggleFolded);
   return (
     <Grid container>
       <Grid item>
         <motion.div variants={item} className="widget w-full p-16 pb-32">
           {widgets && widgets.length !== 0 && users[0] !== undefined ? (
-            <Widget style={classes.customSize} data={widgets} users={users[0]} />
+            <Widget
+              style={!navbarToggle ? classes.customSize1 : classes.customSize2}
+              data={widgets}
+              users={users[0]}
+            />
           ) : (
             <>no widget</>
           )}

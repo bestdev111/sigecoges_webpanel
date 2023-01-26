@@ -182,28 +182,26 @@ const PaymentTab = (props) => {
                                 >
                                   <Grid className="flex justify-center">
                                     {users && users[0] !== undefined
-                                      ? users[0].map((user) => {
+                                      ? users[0].map((user, key) => {
                                           if (
                                             user.id === row.uid &&
                                             user.group_name === props.groupName
                                           ) {
-                                            return <Avatar src={user.photo} />;
+                                            return <Avatar key={key} src={user.photo} />;
                                           }
                                         })
                                       : ''}
                                   </Grid>
-                                  <Typography>
-                                    {users && users[0] !== undefined
-                                      ? users[0].map((user) => {
-                                          if (
-                                            user.id === row.uid &&
-                                            user.group_name === props.groupName
-                                          ) {
-                                            return user.name;
-                                          }
-                                        })
-                                      : ''}
-                                  </Typography>
+                                  {users && users[0] !== undefined
+                                    ? users[0].map((user, key) => {
+                                        if (
+                                          user.id === row.uid &&
+                                          user.group_name === props.groupName
+                                        ) {
+                                          return <Typography key={key}>{user.name}</Typography>;
+                                        }
+                                      })
+                                    : ''}
                                 </TableCell>
                                 <TableCell
                                   align="center"

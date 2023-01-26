@@ -17,7 +17,6 @@ import {
   selectEvents,
   openNewEventDialog,
   openEditEventDialog,
-  updateEvent,
 } from '../store/agendaSlice';
 
 const useStyles = makeStyles((theme) => ({
@@ -109,19 +108,6 @@ const AgendaPage = (props) => {
     );
   };
 
-  const handleEventDrop = (eventDropInfo) => {
-    const { id, title, allDay, start, end, extendedProps } = eventDropInfo.event;
-    dispatch(
-      updateEvent({
-        id,
-        title,
-        allDay,
-        start,
-        end,
-        extendedProps,
-      })
-    );
-  };
   const handleEventClick = (clickInfo) => {
     const { id, title, allDay, start, end, extendedProps } = clickInfo.event;
     dispatch(
@@ -140,12 +126,6 @@ const AgendaPage = (props) => {
     setCurrentDate(rangeInfo);
   };
 
-  const handleEventAdd = (addInfo) => {};
-
-  const handleEventChange = (changeInfo) => {};
-
-  const handleEventRemove = (removeInfo) => {};
-  console.log('agenda Page', events);
   return (
     <div className={clsx(classes.root, 'flex flex-col flex-auto relative')}>
       <AgendaHeader calendarRef={calendarRef} currentDate={currentDate} />
@@ -166,39 +146,13 @@ const AgendaPage = (props) => {
             dayMaxEvents
             weekends
             datesSet={handleDates}
-            // select={handleDateSelect}
             events={events}
             eventContent={renderEventContent}
             eventClick={handleEventClick}
-            eventAdd={handleEventAdd}
-            eventChange={handleEventChange}
-            eventRemove={handleEventRemove}
-            eventDrop={handleEventDrop}
             initialDate={new Date()}
             ref={calendarRef}
           />
         </motion.div>
-
-        {/* <motion.div
-          className={classes.addButton}
-          initial={{ scale: 0 }}
-          animate={{ scale: 1, transition: { delay: 0.4 } }}
-        >
-          <Fab
-            color="secondary"
-            aria-label="add"
-            onClick={() =>
-              dispatch(
-                openNewEventDialog({
-                  start: new Date(),
-                  end: new Date(),
-                })
-              )
-            }
-          >
-            <Icon>add</Icon>
-          </Fab>
-        </motion.div> */}
         <EventDialog />
       </div>
     </div>

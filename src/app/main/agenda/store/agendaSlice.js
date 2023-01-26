@@ -2,7 +2,7 @@ import { createEntityAdapter, createSlice, createAsyncThunk } from '@reduxjs/too
 import axios from 'axios';
 import formatISO from 'date-fns/formatISO';
 import FirebaseService from 'app/services/firebaseService';
-// import fakeCalendarDB from './fakeCalendarDB';
+import CoreService from 'app/services/coreService';
 
 export const dateFormat = 'YYYY-MM-DDTHH:mm:ss.sssZ';
 
@@ -10,24 +10,22 @@ export const getEvents = createAsyncThunk('Agenda/getEvents', async () => {
   const response = FirebaseService.getAgenda().then(
     (agenda) => {
       // eslint-disable-next-line prefer-const
-      let temp = [];
+      const temp = [];
       if (agenda && agenda[0] !== undefined) {
         agenda.forEach((element, index) => {
           // eslint-disable-next-line prefer-const
           let obj = {
             id: index,
+            title: element.content,
             start: formatISO(new Date(element.dateTimestamp)),
             end: formatISO(new Date(element.dateTimestamp)),
-            // start: CoreService.getFullDateStringFromTimestamp(element.dateTimestamp),
-            // end: CoreService.getFullDateStringFromTimestamp(element.dateTimestamp),
             allDay: false,
-            title: element.content,
+            d: CoreService.getFullDateStringFromTimestamp(element.dateTimestamp),
+            uid: element.uid,
           };
           temp.push(obj);
         });
       }
-
-      console.log('===>', temp, agenda);
       return temp;
     },
     (error) => {

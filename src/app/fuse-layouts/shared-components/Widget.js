@@ -41,7 +41,6 @@ function Widget(props) {
           <GoogleMap
             bootstrapURLKeys={{
               key: process.env.REACT_APP_MAP_KEY,
-              // key: 'AIzaSyAXkZSX-YCUwNE_7URaxD5xHWRVnac5nas',
             }}
             defaultZoom={12}
             defaultCenter={[markers[0].lat, markers[0].lng]}

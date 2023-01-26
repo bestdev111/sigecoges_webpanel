@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import { yupResolver } from '@hookform/resolvers/yup';
 import formatISO from 'date-fns/formatISO';
 import { useForm } from 'react-hook-form';
@@ -129,37 +130,53 @@ function EventDialog(props) {
           </Typography>
           <Typography id="start" className="mt-8 mb-16">
             {'Start Time : '}
-            {eventDialog && eventDialog.data ? eventDialog.data.extendedProps.sTime.hour : ''}
+            {eventDialog && eventDialog.data
+              ? eventDialog.data.extendedProps.sTime.hour < 10
+                ? `0${eventDialog.data.extendedProps.sTime.hour}`
+                : eventDialog.data.extendedProps.sTime.hour
+              : ''}
             {' : '}
-            {eventDialog && eventDialog.data ? eventDialog.data.extendedProps.sTime.minute : ''}
+            {eventDialog && eventDialog.data
+              ? eventDialog.data.extendedProps.sTime.minute < 10
+                ? `0${eventDialog.data.extendedProps.sTime.minute}`
+                : eventDialog.data.extendedProps.sTime.minute
+              : ''}
           </Typography>
           <Typography id="end" className="mt-8 mb-16">
             {'End Time : '}
-            {eventDialog && eventDialog.data ? eventDialog.data.extendedProps.eTime.hour : ''}
+            {eventDialog && eventDialog.data
+              ? eventDialog.data.extendedProps.eTime.hour < 10
+                ? `0${eventDialog.data.extendedProps.eTime.hour}`
+                : eventDialog.data.extendedProps.eTime.hour
+              : ''}
             {' : '}
-            {eventDialog && eventDialog.data ? eventDialog.data.extendedProps.eTime.minute : ''}
+            {eventDialog && eventDialog.data
+              ? eventDialog.data.extendedProps.eTime.minute < 10
+                ? `0${eventDialog.data.extendedProps.eTime.minute}`
+                : eventDialog.data.extendedProps.eTime.minute
+              : ''}
           </Typography>
           <Typography id="type" className="mt-8 mb-16">
             {'Type : '}
             {eventDialog && eventDialog.data ? eventDialog.data.extendedProps.type : ''}
           </Typography>
-          <Typography id="isOnDuty" className="mt-8 mb-16">
+          <div id="isOnDuty" className="mt-8 mb-16">
             {eventDialog && eventDialog.data ? (
               eventDialog.data.extendedProps.isOnDuty ? (
                 <FuseNavBadge
-                  className="w-fit"
+                  className="w-64"
                   badge={{ bg: '#f44336', fg: '#ffffff', title: 'On Duty' }}
                 />
               ) : (
                 <FuseNavBadge
-                  className="w-fit"
+                  className="w-64"
                   badge={{ bg: '#f44336', fg: '#ffffff', title: 'Off Duty' }}
                 />
               )
             ) : (
               ''
             )}
-          </Typography>
+          </div>
         </DialogContent>
       </form>
     </Dialog>

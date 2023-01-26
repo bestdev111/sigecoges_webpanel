@@ -1,251 +1,89 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="description" content="Fuse React - Material design admin template with pre-built apps and pages">
-        <meta name="keywords"
-              content="React,Redux,Material UI Next,Material,Material Design,Google Material Design,HTML,CSS,Firebase,Authentication,Material Redux Theme,Material Redux Template">
-        <meta name="author" content="Withinpixels">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <meta name="theme-color" content="#000000">
-        <base href="/">
-        <!--
-          manifest.json provides metadata used when your web app is added to the
-          homescreen on Android. See https://developers.google.com/web/fundamentals/engage-and-retain/web-app-manifest/
-        -->
-        <link rel="manifest" href="%PUBLIC_URL%/manifest.json">
-        <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Welcome to Firebase Hosting</title>
 
-        <!--<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">-->
+    <!-- update the version number as needed -->
+    <script defer src="/__/firebase/9.16.0/firebase-app-compat.js"></script>
+    <!-- include only the Firebase features as you need -->
+    <script defer src="/__/firebase/9.16.0/firebase-auth-compat.js"></script>
+    <script defer src="/__/firebase/9.16.0/firebase-database-compat.js"></script>
+    <script defer src="/__/firebase/9.16.0/firebase-firestore-compat.js"></script>
+    <script defer src="/__/firebase/9.16.0/firebase-functions-compat.js"></script>
+    <script defer src="/__/firebase/9.16.0/firebase-messaging-compat.js"></script>
+    <script defer src="/__/firebase/9.16.0/firebase-storage-compat.js"></script>
+    <script defer src="/__/firebase/9.16.0/firebase-analytics-compat.js"></script>
+    <script defer src="/__/firebase/9.16.0/firebase-remote-config-compat.js"></script>
+    <script defer src="/__/firebase/9.16.0/firebase-performance-compat.js"></script>
+    <!-- 
+      initialize the SDK after all desired features are loaded, set useEmulator to false
+      to avoid connecting the SDK to running emulators.
+    -->
+    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
 
-        <!--        You can choose main icon from variety of the material ui icon fonts-->
-        <link href="%PUBLIC_URL%/assets/fonts/material-design-icons/MaterialIconsOutlined.css" rel="stylesheet">
-        <!--        <link href="%PUBLIC_URL%/assets/fonts/material-design-icons/MaterialIcons.css" rel="stylesheet">-->
-        <!--        <link href="%PUBLIC_URL%/assets/fonts/material-design-icons/MaterialIconsRound.css" rel="stylesheet">-->
-        <!--        <link href="%PUBLIC_URL%/assets/fonts/material-design-icons/MaterialIconsSharp.css" rel="stylesheet">-->
-        <!--        <link href="%PUBLIC_URL%/assets/fonts/material-design-icons/MaterialIconsTwoTone.css" rel="stylesheet">-->
+    <style media="screen">
+      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
+      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
+      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
+      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
+      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
+      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
+      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
+      @media (max-width: 600px) {
+        body, #message { margin-top: 0; background: white; box-shadow: none; }
+        body { border-top: 16px solid #ffa100; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="message">
+      <h2>Welcome</h2>
+      <h1>Firebase Hosting Setup Complete</h1>
+      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>
+      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
+    </div>
+    <p id="load">Firebase SDK Loading&hellip;</p>
 
-        <link href="%PUBLIC_URL%/assets/fonts/meteocons/style.css" rel="stylesheet">
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const loadEl = document.querySelector('#load');
+        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+        // // The Firebase SDK is initialized and available here!
+        //
+        // firebase.auth().onAuthStateChanged(user => { });
+        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
+        // firebase.firestore().doc('/foo/bar').get().then(() => { });
+        // firebase.functions().httpsCallable('yourFunction')().then(() => { });
+        // firebase.messaging().requestPermission().then(() => { });
+        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
+        // firebase.analytics(); // call to activate
+        // firebase.analytics().logEvent('tutorial_completed');
+        // firebase.performance(); // call to activate
+        //
+        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
 
-        <noscript id="jss-insertion-point"></noscript>
-        <!--
-          Notice the use of %PUBLIC_URL% in the tags above.
-          It will be replaced with the URL of the `public` folder during the build.
-          Only files inside the `public` folder can be referenced from the HTML.
-
-          Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-          work correctly both with client-side routing and a non-root public URL.
-          Learn how to configure a non-root public URL by running `npm run build`.
-        -->
-        <title>Fuse React - Material Design Admin Template</title>
-
-        <!-- FUSE Splash Screen CSS -->
-        <style type="text/css">
-            #fuse-splash-screen {
-                display: block;
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background-color: #121212;
-                z-index: 99999;
-                pointer-events: none;
-            }
-
-            #fuse-splash-screen .center {
-                display: block;
-                width: 100%;
-                position: absolute;
-                top: 50%;
-                transform: translateY(-50%);
-            }
-
-            #fuse-splash-screen .logo {
-                width: 128px;
-                margin: 0 auto;
-            }
-
-            #fuse-splash-screen .logo img {
-                filter: drop-shadow(0px 10px 6px rgba(0, 0, 0, 0.2))
-            }
-
-            #fuse-splash-screen .spinner-wrapper {
-                display: block;
-                position: relative;
-                width: 100%;
-                min-height: 100px;
-                height: 100px;
-            }
-
-            #fuse-splash-screen .spinner-wrapper .spinner {
-                position: absolute;
-                overflow: hidden;
-                left: 50%;
-                margin-left: -50px;
-                animation: outer-rotate 2.91667s linear infinite;
-            }
-
-            #fuse-splash-screen .spinner-wrapper .spinner .inner {
-                width: 100px;
-                height: 100px;
-                position: relative;
-                animation: sporadic-rotate 5.25s cubic-bezier(0.35, 0, 0.25, 1) infinite;
-            }
-
-            #fuse-splash-screen .spinner-wrapper .spinner .inner .gap {
-                position: absolute;
-                left: 49px;
-                right: 49px;
-                top: 0;
-                bottom: 0;
-                border-top: 10px solid;
-                box-sizing: border-box;
-            }
-
-            #fuse-splash-screen .spinner-wrapper .spinner .inner .left,
-            #fuse-splash-screen .spinner-wrapper .spinner .inner .right {
-                position: absolute;
-                top: 0;
-                height: 100px;
-                width: 50px;
-                overflow: hidden;
-            }
-
-            #fuse-splash-screen .spinner-wrapper .spinner .inner .left .half-circle,
-            #fuse-splash-screen .spinner-wrapper .spinner .inner .right .half-circle {
-                position: absolute;
-                top: 0;
-                width: 100px;
-                height: 100px;
-                box-sizing: border-box;
-                border: 10px solid #61DAFB;
-                border-bottom-color: transparent;
-                border-radius: 50%;
-            }
-
-            #fuse-splash-screen .spinner-wrapper .spinner .inner .left {
-                left: 0;
-            }
-
-            #fuse-splash-screen .spinner-wrapper .spinner .inner .left .half-circle {
-                left: 0;
-                border-right-color: transparent;
-                animation: left-wobble 1.3125s cubic-bezier(0.35, 0, 0.25, 1) infinite;
-                -webkit-animation: left-wobble 1.3125s cubic-bezier(0.35, 0, 0.25, 1) infinite;
-            }
-
-            #fuse-splash-screen .spinner-wrapper .spinner .inner .right {
-                right: 0;
-            }
-
-            #fuse-splash-screen .spinner-wrapper .spinner .inner .right .half-circle {
-                right: 0;
-                border-left-color: transparent;
-                animation: right-wobble 1.3125s cubic-bezier(0.35, 0, 0.25, 1) infinite;
-                -webkit-animation: right-wobble 1.3125s cubic-bezier(0.35, 0, 0.25, 1) infinite;
-            }
-
-            @keyframes outer-rotate {
-                0% {
-                    transform: rotate(0deg) scale(0.5);
-                }
-                100% {
-                    transform: rotate(360deg) scale(0.5);
-                }
-            }
-
-            @keyframes left-wobble {
-                0%, 100% {
-                    transform: rotate(130deg);
-                }
-                50% {
-                    transform: rotate(-5deg);
-                }
-            }
-
-            @keyframes right-wobble {
-                0%, 100% {
-                    transform: rotate(-130deg);
-                }
-                50% {
-                    transform: rotate(5deg);
-                }
-            }
-
-            @keyframes sporadic-rotate {
-                12.5% {
-                    transform: rotate(135deg);
-                }
-                25% {
-                    transform: rotate(270deg);
-                }
-                37.5% {
-                    transform: rotate(405deg);
-                }
-                50% {
-                    transform: rotate(540deg);
-                }
-                62.5% {
-                    transform: rotate(675deg);
-                }
-                75% {
-                    transform: rotate(810deg);
-                }
-                87.5% {
-                    transform: rotate(945deg);
-                }
-                100% {
-                    transform: rotate(1080deg);
-                }
-            }
-        </style>
-        <!-- / FUSE Splash Screen CSS -->
-    </head>
-    <body>
-        <noscript>
-            You need to enable JavaScript to run this app.
-        </noscript>
-        <div id="root" class="flex">
-            <!-- FUSE Splash Screen -->
-            <div id="fuse-splash-screen">
-
-                <div class="center">
-
-                    <div class="logo">
-                        <img width="128" src="assets/images/logos/fuse.svg" alt="logo">
-                    </div>
-
-                    <!-- Material Design Spinner -->
-                    <div class="spinner-wrapper">
-                        <div class="spinner">
-                            <div class="inner">
-                                <div class="gap"></div>
-                                <div class="left">
-                                    <div class="half-circle"></div>
-                                </div>
-                                <div class="right">
-                                    <div class="half-circle"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- / Material Design Spinner -->
-
-                </div>
-
-            </div>
-            <!-- / FUSE Splash Screen -->
-        </div>
-        <!--
-          This HTML file is a template.
-          If you open it directly in the browser, you will see an empty page.
-
-          You can add webfonts, meta tags, or analytics to this file.
-          The build step will place the bundled scripts into the <body> tag.
-
-          To begin the development, run `npm start` or `yarn start`.
-          To create a production bundle, use `npm run build` or `yarn build`.
-        -->
-    </body>
+        try {
+          let app = firebase.app();
+          let features = [
+            'auth', 
+            'database', 
+            'firestore',
+            'functions',
+            'messaging', 
+            'storage', 
+            'analytics', 
+            'remoteConfig',
+            'performance',
+          ].filter(feature => typeof app[feature] === 'function');
+          loadEl.textContent = `Firebase SDK loaded with ${features.join(', ')}`;
+        } catch (e) {
+          console.error(e);
+          loadEl.textContent = 'Error loading the Firebase SDK, check the console.';
+        }
+      });
+    </script>
+  </body>
 </html>
