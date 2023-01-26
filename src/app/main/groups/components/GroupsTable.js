@@ -205,33 +205,35 @@ function GroupsTable(props) {
                   >
                     <TableCell className={clsx('p-4 md:p-16')} component="td" scope="row">
                       <Grid container justifyContent="space-around">
-                        {userData[0].map((item, i) => {
-                          if (item.group_name === n && item.type === 'ADMIN') {
-                            return (
-                              <Grid key={i} item className="w-70">
-                                <Grid align="center">
-                                  <Avatar alt="" src={item.photo} />
-                                </Grid>
-                                <Typography
-                                  variant="button"
-                                  display="block"
-                                  gutterBottom
-                                  align="center"
-                                >
-                                  <span className={classes.ellipsis}>{item.name}</span>
-                                </Typography>
-                                <Typography
-                                  variant="button"
-                                  display="block"
-                                  gutterBottom
-                                  align="center"
-                                >
-                                  +{item.phone}
-                                </Typography>
-                              </Grid>
-                            );
-                          }
-                        })}
+                        {userData
+                          ? userData[0].map((item, i) => {
+                              if (item.group_name === n && item.type === 'ADMIN') {
+                                return (
+                                  <Grid key={i} item className="w-70">
+                                    <Grid align="center">
+                                      <Avatar alt="" src={item.photo} />
+                                    </Grid>
+                                    <Typography
+                                      variant="button"
+                                      display="block"
+                                      gutterBottom
+                                      align="center"
+                                    >
+                                      <span className={classes.ellipsis}>{item.name}</span>
+                                    </Typography>
+                                    <Typography
+                                      variant="button"
+                                      display="block"
+                                      gutterBottom
+                                      align="center"
+                                    >
+                                      +{item.phone}
+                                    </Typography>
+                                  </Grid>
+                                );
+                              }
+                            })
+                          : null}
                       </Grid>
                     </TableCell>
 
@@ -268,39 +270,41 @@ function GroupsTable(props) {
                           open={Boolean(anchorEl)}
                           onClose={(e) => handleClose(e)}
                         >
-                          {userData[0].map((item, i) => {
-                            if (item.group_name === selectedGroup && item.type === 'STAFF') {
-                              return (
-                                <div key={i}>
-                                  <MenuItem key={i} onClick={(e) => handleClose(e)}>
-                                    <Grid item>
-                                      <Grid align="center">
-                                        <Avatar alt="" src={item.photo} />
-                                      </Grid>
-                                      <Typography
-                                        variant="button"
-                                        display="block"
-                                        gutterBottom
-                                        align="center"
-                                      >
-                                        <span className={classes.ellipsis}>{item.name}</span>
-                                      </Typography>
-                                      <Typography
-                                        variant="button"
-                                        display="block"
-                                        gutterBottom
-                                        align="center"
-                                      >
-                                        +{item.phone}
-                                      </Typography>
-                                    </Grid>
-                                  </MenuItem>
-                                  <Divider />
-                                </div>
-                              );
-                            }
-                            return null;
-                          })}
+                          {userData
+                            ? userData[0].map((item, i) => {
+                                if (item.group_name === selectedGroup && item.type === 'STAFF') {
+                                  return (
+                                    <div key={i}>
+                                      <MenuItem key={i} onClick={(e) => handleClose(e)}>
+                                        <Grid item>
+                                          <Grid align="center">
+                                            <Avatar alt="" src={item.photo} />
+                                          </Grid>
+                                          <Typography
+                                            variant="button"
+                                            display="block"
+                                            gutterBottom
+                                            align="center"
+                                          >
+                                            <span className={classes.ellipsis}>{item.name}</span>
+                                          </Typography>
+                                          <Typography
+                                            variant="button"
+                                            display="block"
+                                            gutterBottom
+                                            align="center"
+                                          >
+                                            +{item.phone}
+                                          </Typography>
+                                        </Grid>
+                                      </MenuItem>
+                                      <Divider />
+                                    </div>
+                                  );
+                                }
+                                return null;
+                              })
+                            : null}
                         </Menu>
                       ) : null}
                     </TableCell>

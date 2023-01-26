@@ -187,24 +187,6 @@ function AboutTab(props) {
                 <Typography className="font-semibold mb-4 text-15">Role</Typography>
                 <Typography>{userRole && userRole[0] ? userRole[0].name : null}</Typography>
               </div>
-
-              {/* <div className="mb-24">
-                <Typography className="font-semibold mb-4 text-15">Locations</Typography>
-
-                {general.locations.map((location) => (
-                  <div className="flex items-center" key={location}>
-                    <Typography>{location}</Typography>
-                    <Icon className="text-16 mx-4" color="action">
-                      location_on
-                    </Icon>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mb-24">
-                <Typography className="font-semibold mb-4 text-15">About Me</Typography>
-                <Typography>{general.about}</Typography>
-              </div> */}
             </CardContent>
           </Card>
         </div>

@@ -6,12 +6,12 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Divider, Tab, Tabs, Typography } from '@material-ui/core';
 import { motion } from 'framer-motion';
 import CoreService from 'app/services/coreService';
+import { selectGroups } from '../store/groupsSlice';
 import ScheduleTab from './tabs/scheduleTab';
 import DocumentTab from './tabs/documentTab';
 import GeofenceTab from './tabs/geofenceTab';
 import AboutTab from './tabs/aboutTab';
 import PaymentTab from './tabs/paymentTab';
-import { selectGroups } from '../store/groupsSlice';
 
 const useStyles = makeStyles((theme) => ({
   avatar: {
@@ -41,18 +41,22 @@ function GroupProfilePage() {
   // const [groupList, setGroupList] = useState('');
   const [selectedGroupName, setSelectedGroupName] = useState('');
   useEffect(() => {
-    const group = CoreService.getGroupList(userData[0]);
-    const id = routeParams;
-    if (id) {
-      setSelectedGroupName(group[id.index]);
+    if (userData) {
+      const group = CoreService.getGroupList(userData[0]);
+      const id = routeParams;
+      if (id) {
+        setSelectedGroupName(group[id.index]);
+      }
     }
   }, []);
 
   useEffect(() => {
-    const group = CoreService.getGroupList(userData[0]);
-    const id = routeParams;
-    if (id) {
-      setSelectedGroupName(group[id.index]);
+    if (userData) {
+      const group = CoreService.getGroupList(userData[0]);
+      const id = routeParams;
+      if (id) {
+        setSelectedGroupName(group[id.index]);
+      }
     }
   }, [routeParams, userData]);
 
@@ -131,11 +135,15 @@ function GroupProfilePage() {
       }
       content={
         <div className="p-16 sm:p-24">
-          {selectedTab === 0 && <AboutTab groupName={selectedGroupName} userData={userData[0]} />}
+          {selectedTab === 0 && (
+            <AboutTab groupName={selectedGroupName} userData={userData ? userData[0] : ''} />
+          )}
           {selectedTab === 1 && <ScheduleTab groupName={selectedGroupName} />}
           {selectedTab === 2 && <DocumentTab />}
           {selectedTab === 3 && <GeofenceTab />}
-          {selectedTab === 4 && <PaymentTab groupName={selectedGroupName} userData={userData[0]} />}
+          {selectedTab === 4 && (
+            <PaymentTab groupName={selectedGroupName} userData={userData ? userData[0] : ''} />
+          )}
         </div>
       }
     />

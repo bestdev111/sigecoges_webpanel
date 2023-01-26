@@ -5,7 +5,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { Button, Icon, IconButton, InputAdornment, TextField } from '@material-ui/core';
 import { submitLoginWithFireBase } from 'app/auth/store/loginSlice';
 import * as yup from 'yup';
-import _ from '@lodash';
+import FuseLoading from '@fuse/core/FuseLoading';
 
 /**
  * Form Validation Schema
@@ -22,6 +22,7 @@ const defaultValues = {
 
 function FirebaseLoginTab(props) {
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(true);
   const login = useSelector(({ auth }) => auth.login);
 
   const { control, setValue, formState, handleSubmit, reset, trigger, setError } = useForm({
@@ -46,9 +47,11 @@ function FirebaseLoginTab(props) {
   }, [login.errors, setError]);
 
   function onSubmit(model) {
-    dispatch(submitLoginWithFireBase(model));
+    dispatch(submitLoginWithFireBase(model)).then(() => setLoading(false));
   }
-
+  if (!loading) {
+    return <FuseLoading />;
+  }
   return (
     <div className="w-full">
       <form className="flex flex-col justify-center w-full" onSubmit={handleSubmit(onSubmit)}>
@@ -114,12 +117,25 @@ function FirebaseLoginTab(props) {
           color="primary"
           className="w-full mx-auto mt-16"
           aria-label="LOG IN"
-          disabled={_.isEmpty(dirtyFields) || !isValid}
+          // disabled={_.isEmpty(dirtyFields) || !isValid}
           value="firebase"
         >
           Login
-          {/* <CircularProgress /> */}
         </Button>
+        {/* {loading ? (
+        ) : (
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            className="w-full mx-auto mt-16"
+            aria-label="LOG IN"
+            // disabled={_.isEmpty(dirtyFields) || !isValid}
+            value="firebase"
+          >
+            <CircularProgress />
+          </Button>
+        )} */}
       </form>
     </div>
   );

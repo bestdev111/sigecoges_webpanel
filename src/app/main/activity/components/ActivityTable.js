@@ -30,7 +30,7 @@ function ActivityTable(props) {
 
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState([]);
-  const [data, setData] = useState(activities);
+  const [data, setData] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [order, setOrder] = useState({
@@ -45,17 +45,10 @@ function ActivityTable(props) {
   }, []);
 
   useEffect(() => {
-    if (searchText.length !== 0) {
-      setData(
-        _.filter(activities[0], (item) =>
-          item.name.toString().toLowerCase().includes(searchText.toString().toLowerCase())
-        )
-      );
-      setPage(0);
-    } else {
+    if (activities) {
       setData(activities[0]);
     }
-  }, [activities, searchText]);
+  }, [activities]);
 
   function handleRequestSort(event, property) {
     const id = property;
@@ -99,18 +92,20 @@ function ActivityTable(props) {
     return <FuseLoading />;
   }
 
-  if (data && data[0].length === 0) {
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1, transition: { delay: 0.1 } }}
-        className="flex flex-1 items-center justify-center h-full"
-      >
-        <Typography color="textSecondary" variant="h5">
-          There are no activity!
-        </Typography>
-      </motion.div>
-    );
+  if (data) {
+    if (data[0].length === 0) {
+      return (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1, transition: { delay: 0.1 } }}
+          className="flex flex-1 items-center justify-center h-full"
+        >
+          <Typography color="textSecondary" variant="h5">
+            There are no activity!
+          </Typography>
+        </motion.div>
+      );
+    }
   }
   return (
     <div className="w-full flex flex-col">
@@ -121,7 +116,7 @@ function ActivityTable(props) {
             order={order}
             onSelectAllClick={handleSelectAllClick}
             onRequestSort={handleRequestSort}
-            rowCount={data[0].length}
+            rowCount={data ? data.length : 0}
             onMenuItemClick={handleDeselect}
           />
 

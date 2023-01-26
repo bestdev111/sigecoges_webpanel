@@ -49,8 +49,6 @@ const useStyles = makeStyles((theme) => ({
 
 function ActivityTableHead(props) {
   const classes = useStyles(props);
-  const { selectedProductIds } = props;
-  const numSelected = selectedProductIds.length;
 
   const [selectedProductsMenu, setSelectedProductsMenu] = useState(null);
 
