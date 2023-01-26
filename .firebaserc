@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "sigecoges"
-  }
+    "default": "sigecoges-7e503",
+    "sigecoges-7e503": "sigecoges-7e503"
+  },
+  "targets": {},
+  "etags": {}
 }

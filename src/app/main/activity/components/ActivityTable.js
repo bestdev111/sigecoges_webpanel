@@ -76,10 +76,6 @@ function ActivityTable(props) {
     setSelected([]);
   }
 
-  function handleClick(index) {
-    // props.history.push(`/userprofile/${index}`);
-  }
-
   function handleChangePage(event, value) {
     setPage(value);
   }
@@ -149,7 +145,6 @@ function ActivityTable(props) {
                     tabIndex={-1}
                     key={index}
                     selected={isSelected}
-                    // onClick={(event) => handleClick(n.id)}
                   >
                     <TableCell align="center" className="p-4 md:p-16" component="th" scope="row">
                       {index + 1}

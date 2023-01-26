@@ -163,64 +163,6 @@ function Activity(props) {
                     {' hours '}
                     {'this month'}
                   </Typography>
-                  {/* <Icon
-                    component={motion.span}
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1, transition: { delay: 0.2 } }}
-                    className="text-24 md:text-32 mr-12"
-                  >
-                    account_balance_wallet
-                  </Icon>
-                  <Typography
-                    variant="h6"
-                    color="inherit"
-                    className="basis-3/4 px-6 font-small"
-                  >
-                    {totalHours}
-                    {" hours "}
-                  </Typography>
-                  <Typography
-                    variant="h6"
-                    color="inherit"
-                    className="basis-3/4 px-6 font-small"
-                  >
-                    X
-                  </Typography>
-                  <Typography
-                    variant="h6"
-                    color="inherit"
-                    className="basis-3/4 px-6 font-small"
-                  >
-                    {props.rate ? formatter.format(props.rate) : 0}
-                  </Typography>
-                  <Typography
-                    variant="h6"
-                    color="inherit"
-                    className="basis-3/4 px-6 font-small"
-                  >
-                    +
-                  </Typography>
-                  <Typography
-                    variant="h6"
-                    color="inherit"
-                    className="basis-3/4 px-6 font-small"
-                  >
-                    {props.salary ? formatter.format(props.salary) : 0}
-                  </Typography>
-                  <Typography
-                    variant="h6"
-                    color="inherit"
-                    className="basis-3/4 px-6 font-small"
-                  >
-                    =
-                  </Typography>
-                  <Typography
-                    variant="h6"
-                    color="inherit"
-                    className="basis-3/4 px-6 font-small"
-                  >
-                    {totalSalary ? formatter.format(totalSalary) : 0}
-                  </Typography> */}
                 </Grid>
                 <Grid item>
                   <DatePicker
