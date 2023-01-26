@@ -88,20 +88,18 @@ function ActivityTable(props) {
     return <FuseLoading />;
   }
 
-  if (data) {
-    if (data[0].length === 0) {
-      return (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1, transition: { delay: 0.1 } }}
-          className="flex flex-1 items-center justify-center h-full"
-        >
-          <Typography color="textSecondary" variant="h5">
-            There are no activity!
-          </Typography>
-        </motion.div>
-      );
-    }
+  if (data && data.length === 0) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1, transition: { delay: 0.1 } }}
+        className="flex flex-1 items-center justify-center h-full"
+      >
+        <Typography color="textSecondary" variant="h5">
+          There are no activity!
+        </Typography>
+      </motion.div>
+    );
   }
   return (
     <div className="w-full flex flex-col">
