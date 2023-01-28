@@ -44,9 +44,7 @@ function RegistrationPageContent() {
   return (
     <motion.div variants={container} initial="hidden" animate="show">
       <div className="md:flex">
-        <div className="flex flex-col flex-1 md:ltr:pr-32 md:rtl:pl-32 p-32">
-          xxx
-        </div>
+        <div className="flex flex-col flex-1 md:ltr:pr-32 md:rtl:pl-32 p-32" />
       </div>
     </motion.div>
   );
