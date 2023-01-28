@@ -38,12 +38,23 @@ function FirebaseLoginTab(props) {
   const formRef = useRef(null);
 
   useEffect(() => {
-    login.errors.forEach((error) => {
-      setError(error.type, {
-        type: 'manual',
-        message: error.message,
-      });
-    });
+    if (login) {
+      if (login.errors.length > 0) {
+        setLoading(true);
+        login.errors.forEach((error) => {
+          setError(error.type, {
+            type: 'manual',
+            message: error.message,
+          });
+        });
+      } else {
+        setLoading(true);
+        setError(login.errors.type, {
+          type: 'manual',
+          message: login.errors.message,
+        });
+      }
+    }
   }, [login.errors, setError]);
 
   function onSubmit(model) {

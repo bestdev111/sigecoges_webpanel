@@ -5,8 +5,9 @@ import { darken } from '@material-ui/core/styles/colorManipulator';
 import Typography from '@material-ui/core/Typography';
 import clsx from 'clsx';
 import { motion } from 'framer-motion';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import FirebaseLoginTab from './tabs/FirebaseLoginTab';
+import FirebaseRegisterTab from './tabs/FirebaseRegisterTab';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -26,8 +27,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Login() {
+function Register() {
   const classes = useStyles();
+  const [selectedTab, setSelectedTab] = useState(0);
+
+  function handleTabChange(event, value) {
+    setSelectedTab(value);
+  }
+
   return (
     <div
       className={clsx(
@@ -52,7 +59,7 @@ function Login() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1, transition: { delay: 0.2 } }}
             >
-              <div className="flex items-center mb-48">
+              <div className="flex items-center justif-center mb-32">
                 <img className="logo-icon w-48" src="assets/images/logos/fuse.svg" alt="logo" />
                 <div className="border-l-1 mr-4 w-1 h-40" />
                 <div>
@@ -62,13 +69,14 @@ function Login() {
                 </div>
               </div>
             </motion.div>
-            <FirebaseLoginTab />
+            <FirebaseRegisterTab />
           </CardContent>
+
           <div className="flex flex-col items-center justify-center pb-32">
             <div>
-              <span className="font-normal mr-8">Don't have an account?</span>
-              <Link className="font-normal" to="/register">
-                Register
+              <span className="font-normal mr-8">Already have an account?</span>
+              <Link className="font-normal" to="/login">
+                Login
               </Link>
             </div>
           </div>
@@ -97,4 +105,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default Register;

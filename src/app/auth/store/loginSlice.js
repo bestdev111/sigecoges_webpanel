@@ -8,43 +8,121 @@ export const submitLoginWithFireBase =
     if (!firebaseService.auth) {
       return () => false;
     }
-    return firebaseService.auth
-      .signInWithEmailAndPassword(email, password)
-      .then(() => {
-        dispatch(showMessage({ message: 'successfully logged' }));
-        return dispatch(loginSuccess());
-      })
-      .catch((error) => {
-        const emailErrorCodes = [
-          'auth/email-already-in-use',
-          'auth/invalid-email',
-          'auth/operation-not-allowed',
-          'auth/user-not-found',
-          'auth/user-disabled',
-        ];
-        const passwordErrorCodes = ['auth/weak-password', 'auth/wrong-password'];
-        const response = [];
+    return firebaseService.db.ref('tbl_admin').on('value', async (snapshot) => {
+      if (snapshot.val() !== null && snapshot.val().email === email) {
+        if (snapshot.val().password.toString() === password.toString()) {
+          return firebaseService.auth
+            .signInWithEmailAndPassword(email, password)
+            .then(() => {
+              dispatch(showMessage({ message: 'successfully logged' }));
+              const role = 'super_admin';
+              return dispatch(loginSuccess(role));
+            })
+            .catch((error) => {
+              const emailErrorCodes = [
+                'auth/email-already-in-use',
+                'auth/invalid-email',
+                'auth/operation-not-allowed',
+                'auth/user-not-found',
+                'auth/user-disabled',
+              ];
+              const passwordErrorCodes = ['auth/weak-password', 'auth/wrong-password'];
+              const response = [];
 
-        if (emailErrorCodes.includes(error.code)) {
-          response.push({
-            type: 'email',
-            message: error.message,
-          });
+              if (emailErrorCodes.includes(error.code)) {
+                response.push({
+                  type: 'email',
+                  message: error.message,
+                });
+              }
+
+              if (passwordErrorCodes.includes(error.code)) {
+                response.push({
+                  type: 'password',
+                  message: error.message,
+                });
+              }
+
+              if (error.code === 'auth/invalid-api-key') {
+                dispatch(showMessage({ message: error.message }));
+              }
+
+              return dispatch(loginError(response));
+            });
         }
-
-        if (passwordErrorCodes.includes(error.code)) {
-          response.push({
+        return dispatch(
+          loginError({
             type: 'password',
-            message: error.message,
-          });
-        }
+            message: 'Invalid Password',
+          })
+        );
+      }
+      firebaseService.db
+        .ref('tbl_user')
+        .orderByChild('email')
+        .equalTo(email)
+        .on('value', async (snapshot1) => {
+          if (snapshot1.val() !== null) {
+            const userId = Object.keys(snapshot1.val());
+            if (
+              snapshot1.val()[userId] &&
+              snapshot1.val()[userId].password.toString() === password.toString() &&
+              snapshot1.val()[userId].type === 'ADMIN'
+            ) {
+              return firebaseService.auth
+                .signInWithEmailAndPassword(email, password)
+                .then(() => {
+                  dispatch(showMessage({ message: 'successfully logged' }));
+                  const role = 'admin';
+                  return dispatch(loginSuccess(role));
+                })
+                .catch((error) => {
+                  const emailErrorCodes = [
+                    'auth/email-already-in-use',
+                    'auth/invalid-email',
+                    'auth/operation-not-allowed',
+                    'auth/user-not-found',
+                    'auth/user-disabled',
+                  ];
+                  const passwordErrorCodes = ['auth/weak-password', 'auth/wrong-password'];
+                  const response = [];
 
-        if (error.code === 'auth/invalid-api-key') {
-          dispatch(showMessage({ message: error.message }));
-        }
+                  if (emailErrorCodes.includes(error.code)) {
+                    response.push({
+                      type: 'email',
+                      message: error.message,
+                    });
+                  }
 
-        return dispatch(loginError(response));
-      });
+                  if (passwordErrorCodes.includes(error.code)) {
+                    response.push({
+                      type: 'password',
+                      message: error.message,
+                    });
+                  }
+
+                  if (error.code === 'auth/invalid-api-key') {
+                    dispatch(showMessage({ message: error.message }));
+                  }
+
+                  return dispatch(loginError(response));
+                });
+            }
+            return dispatch(
+              loginError({
+                type: 'password',
+                message: 'Invalid Password',
+              })
+            );
+          }
+          return dispatch(
+            loginError({
+              type: 'email',
+              message: 'Not found email',
+            })
+          );
+        });
+    });
   };
 
 const initialState = {

@@ -2,6 +2,13 @@ import { TableCell, TableHead, TableRow, TableSortLabel, Tooltip } from '@materi
 
 const rows = [
   {
+    id: 'id',
+    align: 'center',
+    disablePadding: true,
+    label: 'No',
+    sort: true,
+  },
+  {
     id: 'group_admin',
     align: 'center',
     disablePadding: true,
@@ -9,17 +16,17 @@ const rows = [
     sort: true,
   },
   {
-    id: 'group_staff',
-    align: 'center',
-    disablePadding: false,
-    label: 'Group Staffs',
-    sort: true,
-  },
-  {
     id: 'group_name',
     align: 'center',
     disablePadding: false,
     label: 'Group Name',
+    sort: true,
+  },
+  {
+    id: 'group_staff',
+    align: 'center',
+    disablePadding: false,
+    label: 'Group Staffs',
     sort: true,
   },
 ];
@@ -50,7 +57,7 @@ function GroupsTableHead(props) {
                   <TableSortLabel
                     active={props.order.id === i}
                     direction={props.order.direction}
-                    onClick={createSortHandler(i)}
+                    // onClick={createSortHandler(i)}
                     className="font-semibold"
                   >
                     {row.label}

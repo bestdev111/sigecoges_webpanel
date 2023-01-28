@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 /* eslint-disable no-plusplus */
 /* eslint import/no-extraneous-dependencies: off */
 import firebase from 'firebase/app';
@@ -27,6 +28,11 @@ class FirebaseService {
     success(true);
   }
 
+  doSendEmailVerification = () =>
+    this.auth.currentUser.sendEmailVerification({
+      url: process.env.REACT_APP_CONFIRMATION_EMAIL_REDIRECT,
+    });
+
   subscribe = () => {
     if (!firebase.apps.length) {
       return false;
@@ -44,9 +50,9 @@ class FirebaseService {
     }
     return new Promise((resolve, reject) => {
       this.db.ref('tbl_user').on('value', async (snapshot) => {
-        const ids = Object.keys(snapshot.val());
-        const temp = [];
         if (snapshot.numChildren !== 0) {
+          const ids = Object.keys(snapshot.val());
+          let temp = [];
           let index = 0;
           snapshot.forEach((snap) => {
             const userObject = snap.val();
@@ -54,9 +60,8 @@ class FirebaseService {
             temp.push(userObject);
             index++;
           });
+          resolve(temp);
         }
-        // console.log('initial UserDATA========>', temp);
-        resolve(temp);
       });
     });
   };

@@ -12,6 +12,7 @@ import {
   TableRow,
   TablePagination,
   Typography,
+  Avatar,
 } from '@material-ui/core';
 import _ from '@lodash';
 import { motion } from 'framer-motion';
@@ -160,9 +161,16 @@ function ActivityTable(props) {
                     </TableCell>
                     <TableCell align="center" className="p-4 md:p-16" component="th" scope="row">
                       {users && users[0] !== undefined
-                        ? users[0].map((user) => {
+                        ? users[0].map((user, i) => {
                             if (user.id === n.uid) {
-                              return user.name;
+                              return (
+                                <div key={i}>
+                                  <div className="flex justify-center">
+                                    <Avatar src={user.photo} />
+                                  </div>
+                                  <div className="flex justify-center">{user.name}</div>
+                                </div>
+                              );
                             }
                           })
                         : ''}

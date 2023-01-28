@@ -32,10 +32,18 @@ class FuseAuthorization extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    const { location, userRole } = props;
+    const { location, userRole, login, history } = props;
     const { pathname } = location;
 
     const matched = matchRoutes(state.routes, pathname)[0];
+
+    // console.log(login.success === false);
+    // if (login.success === false) {
+    //   history.push({
+    //     pathname: '/login',
+    //     state: { redirectUrl: pathname },
+    //   });
+    // }
 
     return {
       accessGranted: matched ? FuseUtils.hasPermission(matched.route.auth, userRole) : true,
@@ -43,7 +51,7 @@ class FuseAuthorization extends Component {
   }
 
   redirectRoute() {
-    const { location, userRole, history } = this.props;
+    const { location, userRole, history, login } = this.props;
     const { pathname, state } = location;
     const redirectUrl = state && state.redirectUrl ? state.redirectUrl : '/';
 
@@ -62,6 +70,7 @@ class FuseAuthorization extends Component {
         User must be on unAuthorized page or just logged in
         Redirect to dashboard or redirectUrl
         */
+
       history.push({
         pathname: redirectUrl,
       });
@@ -69,7 +78,10 @@ class FuseAuthorization extends Component {
   }
 
   render() {
-    // console.info('Fuse Authorization rendered', this.state.accessGranted);
+    console.info('Fuse Authorization rendered', this.state.accessGranted, this.props);
+    // if (this.props.login.success === false && window.location.pathname !== '/login') {
+    //   window.location.href = '/login';
+    // }
     return this.state.accessGranted ? <>{this.props.children}</> : null;
   }
 }
@@ -77,6 +89,7 @@ class FuseAuthorization extends Component {
 function mapStateToProps({ auth }) {
   return {
     userRole: auth.user.role,
+    login: auth.login,
   };
 }
 

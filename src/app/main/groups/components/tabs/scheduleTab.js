@@ -155,7 +155,7 @@ function ScheduleTab(props) {
             dayMaxEvents
             weekends
             datesSet={handleDates}
-            // select={handleDateSelect}
+            firstDay={1}
             events={events}
             eventContent={renderEventContent}
             eventClick={handleEventClick}

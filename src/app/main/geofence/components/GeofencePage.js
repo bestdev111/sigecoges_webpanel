@@ -1,58 +1,75 @@
-import { useEffect } from 'react';
+/* eslint-disable no-restricted-syntax */
+import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
 import withReducer from 'app/store/withReducer';
 import { Grid } from '@material-ui/core';
-import Widget from 'app/fuse-layouts/shared-components/Widget';
+import Map from 'app/fuse-layouts/shared-components/Map';
 import { makeStyles } from '@material-ui/core/styles';
+import clsx from 'clsx';
+import FuseLoading from '@fuse/core/FuseLoading';
 import reducer from '../store';
 import { selectWidgetsEntities, getWidgets } from '../store/widgetsSlice';
-import { selectUsers, getUsers } from '../store/usersSlice';
 
 const useStyles = makeStyles((theme) => ({
-  customSize1: {
+  customSize: {
     width: 'calc(100vw - 312px)',
     height: 'calc(100vh - 115px)',
   },
-  customSize2: {
-    width: 'calc(100vw)',
-    height: 'calc(100vh - 115px)',
-  },
+  // customSize2: {
+  //   width: 'calc(100vw)',
+  //   height: 'calc(100vh - 115px)',
+  // },
 }));
 
 const item = {
   hidden: { opacity: 0, y: 20 },
   show: { opacity: 1, y: 0 },
 };
+
 const GeofencePage = (props) => {
   const classes = useStyles(props);
-
   const dispatch = useDispatch();
   const widgets = useSelector(selectWidgetsEntities);
-  const users = useSelector(selectUsers);
-  const navbarToggle = useSelector(({ fuse }) => fuse.navbar.navbarToggle);
-  const navbarToggleFolded = useSelector(({ fuse }) => fuse.navbar.navbarToggleFolded);
+  const [data, setData] = useState([]);
 
   useEffect(() => {
     dispatch(getWidgets());
-    dispatch(getUsers());
   }, []);
   useEffect(() => {
-    console.log(navbarToggleFolded);
-  }, [navbarToggleFolded]);
-  console.log('navbarToggleFolded', navbarToggleFolded);
+    const tempWidgets = [];
+    if (widgets) {
+      for (const key in widgets) {
+        if (Object.hasOwnProperty.call(widgets, key)) {
+          const element = widgets[key];
+          tempWidgets.push(element);
+        }
+      }
+      setData(tempWidgets);
+    }
+  }, [widgets]);
+  console.log('widgets==>', widgets);
   return (
     <Grid container>
-      <Grid item>
+      <Grid item className={clsx(classes.customSize)}>
         <motion.div variants={item} className="widget w-full p-16 pb-32">
-          {widgets && widgets.length !== 0 && users[0] !== undefined ? (
-            <Widget
-              style={!navbarToggle ? classes.customSize1 : classes.customSize2}
-              data={widgets}
-              users={users[0]}
+          {data && data.length !== 0 ? (
+            <Map
+              zoom={12}
+              markers={data}
+              googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyDIrEBxeneMNEsVrdnTRZaadT4bV1JjGdI&v=3.exp&libraries=geometry,drawing,places"
+              loadingElement={
+                <div style={{ width: 'calc(100vw - 312px)', height: 'calc(100vh - 115px)' }} />
+              }
+              containerElement={
+                <div style={{ width: 'calc(100vw - 312px)', height: 'calc(100vh - 115px)' }} />
+              }
+              mapElement={
+                <div style={{ width: 'calc(100vw - 312px)', height: 'calc(100vh - 115px)' }} />
+              }
             />
           ) : (
-            <>no widget</>
+            <FuseLoading />
           )}
         </motion.div>
       </Grid>

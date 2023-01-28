@@ -1,11 +1,19 @@
 import { useEffect, useState } from 'react';
-import { AppBar, Card, CardContent, Toolbar, Typography } from '@material-ui/core';
+import {
+  AppBar,
+  Card,
+  CardContent,
+  Toolbar,
+  Typography,
+  Grid,
+  Icon,
+  TextField,
+} from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { motion } from 'framer-motion';
 import clsx from 'clsx';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUserRole, selectRole } from '../../store/roleSlice';
-import AboutUs from './fakeDB';
 
 const useStyles = makeStyles((theme) => ({
   avatar: {
@@ -20,18 +28,18 @@ const useStyles = makeStyles((theme) => ({
 function AboutTab(props) {
   const dispatch = useDispatch();
   const classes = useStyles();
-  const [data, setData] = useState(null);
+  const [searchStaff, setSearchStaff] = useState('');
   const [viewUser, setViewUser] = useState(null);
   const userRole = useSelector(selectRole);
-  useEffect(() => {
-    setData(AboutUs[0].about);
-  }, []);
+
   useEffect(() => {
     dispatch(getUserRole(viewUser));
   }, [dispatch, viewUser]);
-  if (!data) {
-    return null;
-  }
+
+  useEffect(() => {
+    // dispatch(getUserRole(viewUser));
+    console.log('searchStaff=>', searchStaff);
+  }, [dispatch, searchStaff]);
 
   const container = {
     show: {
@@ -92,7 +100,7 @@ function AboutTab(props) {
           </Card>
           <Card component={motion.div} variants={item} className="w-full mb-32 rounded-16 shadow">
             <AppBar position="static" elevation={0}>
-              <Toolbar className="px-8">
+              <Toolbar className="px-8 flex justify-between">
                 <Typography
                   variant="subtitle1"
                   color="inherit"
@@ -103,6 +111,18 @@ function AboutTab(props) {
               </Toolbar>
             </AppBar>
             <CardContent className="flex flex-wrap p-16">
+              <Grid container spacing={1} alignItems="flex-end" className="justify-end mb-3">
+                <Grid item>
+                  <Icon>search</Icon>
+                </Grid>
+                <Grid item>
+                  <TextField
+                    id="input-with-icon-grid"
+                    label="Search staff"
+                    onChange={(e) => setSearchStaff(e.target.value)}
+                  />
+                </Grid>
+              </Grid>
               {props.userData
                 ? props.userData.map((user) => {
                     if (user.group_name === props.groupName && user.type === 'STAFF') {

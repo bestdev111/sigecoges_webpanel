@@ -1,4 +1,5 @@
 import i18next from 'i18next';
+import { authRoles } from 'app/auth';
 import ar from './navigation-i18n/ar';
 import en from './navigation-i18n/en';
 import tr from './navigation-i18n/tr';
@@ -20,6 +21,7 @@ const navigationConfig = [
         title: 'Users',
         translate: 'Users',
         type: 'item',
+        auth: authRoles.admin,
         url: '/users',
         icon: 'person',
       },
@@ -28,6 +30,7 @@ const navigationConfig = [
         title: 'Groups',
         translate: 'Groups',
         type: 'item',
+        auth: authRoles.admin,
         url: '/groups',
         icon: 'group',
       },
@@ -36,6 +39,7 @@ const navigationConfig = [
         title: 'Activity',
         translate: 'Activity',
         type: 'item',
+        auth: authRoles.admin,
         url: '/activity',
         icon: 'show_chart',
         badge: true,
@@ -45,6 +49,7 @@ const navigationConfig = [
         title: 'Agenda',
         translate: 'Agenda',
         type: 'item',
+        auth: authRoles.admin,
         url: '/agenda',
         icon: 'event_available',
       },
@@ -53,6 +58,7 @@ const navigationConfig = [
         title: 'Geofence',
         translate: 'Geofence',
         type: 'item',
+        auth: authRoles.admin,
         url: '/geofence',
         icon: 'person_pin_circle',
       },
@@ -61,8 +67,26 @@ const navigationConfig = [
         title: 'News',
         translate: 'News',
         type: 'item',
+        auth: authRoles.admin,
         url: '/news',
         icon: 'book',
+      },
+    ],
+  },
+  {
+    id: 'user',
+    title: '',
+    translate: '',
+    type: 'group',
+    children: [
+      {
+        id: 'staff_registration',
+        title: 'Staff Registration',
+        translate: 'Staff Registration',
+        type: 'item',
+        auth: authRoles.admin,
+        url: '/registration',
+        icon: 'person_add',
       },
     ],
   },

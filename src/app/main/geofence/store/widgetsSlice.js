@@ -11,8 +11,6 @@ export const getWidgets = createAsyncThunk('Geofence/getWidgets', async () => {
       return error;
     }
   );
-  // const dataTemp = analyticsDashboardAppDB.widgets;
-  // console.log('===>', response);
   const data = await response;
   return data;
 });

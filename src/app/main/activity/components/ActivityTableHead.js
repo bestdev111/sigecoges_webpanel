@@ -22,7 +22,7 @@ const rows = [
     id: 'name',
     align: 'center',
     disablePadding: false,
-    label: 'Name',
+    label: 'Staff',
     sort: true,
   },
   {

@@ -6,16 +6,16 @@ import history from '@history';
 import { Router } from 'react-router-dom';
 import { SnackbarProvider } from 'notistack';
 import FuseLoading from '@fuse/core/FuseLoading';
+import axios from 'axios';
 import { Auth } from './auth';
 import withAppProviders from './withAppProviders';
-// import axios from 'axios';
 
 /**
  * Axios HTTP Request defaults
  */
-// axios.defaults.baseURL = "";
-// axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
-// axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded';
+axios.defaults.baseURL = 'http://localhost:3000';
+axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+axios.defaults.headers.common['Content-Type'] = 'application/x-www-form-urlencoded';
 
 const App = () => {
   return (

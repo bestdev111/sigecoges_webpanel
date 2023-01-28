@@ -108,7 +108,7 @@ function GroupProfilePage() {
             <Tab
               className="text-14 font-semibold min-h-40 min-w-64 mx-4"
               disableRipple
-              label="About"
+              label="Staffs"
             />
             <Tab
               className="text-14 font-semibold min-h-40 min-w-64 mx-4"
@@ -140,7 +140,7 @@ function GroupProfilePage() {
           )}
           {selectedTab === 1 && <ScheduleTab groupName={selectedGroupName} />}
           {selectedTab === 2 && <DocumentTab />}
-          {selectedTab === 3 && <GeofenceTab />}
+          {selectedTab === 3 && <GeofenceTab groupName={selectedGroupName} />}
           {selectedTab === 4 && (
             <PaymentTab groupName={selectedGroupName} userData={userData ? userData[0] : ''} />
           )}

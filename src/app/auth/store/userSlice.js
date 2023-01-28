@@ -37,7 +37,6 @@ export const createUserSettingsFirebase = (authUser) => async (dispatch, getStat
     uid: authUser.uid,
     role: ['admin'],
     data: {
-      displayName: authUser.displayName,
       email: authUser.email,
       settings: { ...fuseDefaultSettings },
     },
@@ -81,7 +80,6 @@ export const updateUserShortcuts = (shortcuts) => async (dispatch, getState) => 
     ...user,
     data: {
       ...user.data,
-      shortcuts,
     },
   };
 
@@ -123,10 +121,8 @@ export const updateUserData = (user) => async (dispatch, getState) => {
 const initialState = {
   role: [], // guest
   data: {
-    displayName: 'John Doe',
     photoURL: 'assets/images/avatars/Velazquez.jpg',
-    email: 'johndoe@withinpixels.com',
-    shortcuts: ['calendar', 'mail', 'contacts', 'todo'],
+    // email: 'johndoe@withinpixels.com',
   },
 };
 

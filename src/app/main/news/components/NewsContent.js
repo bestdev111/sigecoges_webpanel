@@ -26,7 +26,6 @@ import ImageView from 'react-single-image-viewer'
 import clsx from 'clsx';
 import { getAllNews, selectAllNews } from '../store/newsSlice';
 import { allUsers, selectAllUser } from '../store/allUserSlice';
-import profileDB from './fakeNewsData';
 import 'react-single-image-viewer/dist/index.css'
 
 const useStyles = makeStyles((theme) => ({
@@ -54,20 +53,13 @@ const useStyles = makeStyles((theme) => ({
 function NewsHeader() {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const [data, setData] = useState(null);
   const [expanded, setExpanded] = useState(false);
   const allNews = useSelector(selectAllNews);
   const allUsersData = useSelector(selectAllUser);
   useEffect(() => {
-    const fakeData = profileDB;
     dispatch(getAllNews());
     dispatch(allUsers());
-    setData(fakeData.news);
   }, [dispatch]);
-
-  if (!data) {
-    return null;
-  }
 
   const handleChange = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
@@ -141,7 +133,7 @@ function NewsHeader() {
                             </div>
                           </Grid>
                           <Grid item>
-                              {post.media && <ImageView src={post.media} height="100" width="200" callback=""/>}
+                              {post.media && <ImageView className='rounded-lg' src={post.media} height="100" width="200" callback=""/>}
                           </Grid>
                         </Grid>
                       </CardContent>

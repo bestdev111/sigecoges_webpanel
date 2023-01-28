@@ -8,7 +8,6 @@ import FuseScrollbars from '@fuse/core/FuseScrollbars';
 import FuseLoading from '@fuse/core/FuseLoading';
 import {
   Avatar,
-  Button,
   Table,
   TableBody,
   TableCell,
@@ -16,9 +15,6 @@ import {
   TableRow,
   Typography,
   Grid,
-  Menu,
-  MenuItem,
-  Divider,
 } from '@material-ui/core';
 import _ from '@lodash';
 import clsx from 'clsx';
@@ -145,20 +141,16 @@ function GroupsTable(props) {
     );
   }
   const filterFunc = (n) => {
-    let bool = false;
+    let bool = 0;
     {
       userData[0].forEach((item) => {
         if (item.group_name === n && item.type === 'STAFF') {
-          return (bool = true);
+          bool++;
         }
       });
     }
     return bool;
   };
-  // const goGeofence = (e, n) => {
-  //   if (e && e.stopPropagation) e.stopPropagation();
-  //   props.history.push(`/geofence`);
-  // };
   return (
     <div className="w-full flex flex-col">
       <FuseScrollbars className="flex-grow overflow-x-auto">
@@ -203,6 +195,9 @@ function GroupsTable(props) {
                     selected={isSelected}
                     onClick={() => handleClick(index)}
                   >
+                    <TableCell className="p-4 md:p-16" component="td" scope="row" align="center">
+                      {index + 1}
+                    </TableCell>
                     <TableCell className={clsx('p-4 md:p-16')} component="td" scope="row">
                       <Grid container justifyContent="space-around">
                         {userData
@@ -237,89 +232,17 @@ function GroupsTable(props) {
                       </Grid>
                     </TableCell>
 
+                    <TableCell className="p-4 md:p-16" component="td" scope="row" align="center">
+                      {n}
+                    </TableCell>
                     <TableCell
                       className={clsx('p-4 md:p-16 truncate')}
                       component="td"
                       scope="row"
                       align="center"
                     >
-                      {filterFunc(n) ? (
-                        <Button
-                          variant="outlined"
-                          color="secondary"
-                          aria-controls="simple-menu"
-                          aria-haspopup="true"
-                          onClick={(e) => {
-                            // eslint-disable-next-line no-lone-blocks
-                            {
-                              // eslint-disable-next-line no-unused-expressions
-                              filterFunc(n) ? handleClick1(e, n) : '';
-                            }
-                          }}
-                        >
-                          View Staffs
-                        </Button>
-                      ) : (
-                        'No Staff'
-                      )}
-                      {filterFunc(n) ? (
-                        <Menu
-                          id="simple-menu"
-                          keepMounted
-                          anchorEl={anchorEl}
-                          open={Boolean(anchorEl)}
-                          onClose={(e) => handleClose(e)}
-                        >
-                          {userData
-                            ? userData[0].map((item, i) => {
-                                if (item.group_name === selectedGroup && item.type === 'STAFF') {
-                                  return (
-                                    <div key={i}>
-                                      <MenuItem key={i} onClick={(e) => handleClose(e)}>
-                                        <Grid item>
-                                          <Grid align="center">
-                                            <Avatar alt="" src={item.photo} />
-                                          </Grid>
-                                          <Typography
-                                            variant="button"
-                                            display="block"
-                                            gutterBottom
-                                            align="center"
-                                          >
-                                            <span className={classes.ellipsis}>{item.name}</span>
-                                          </Typography>
-                                          <Typography
-                                            variant="button"
-                                            display="block"
-                                            gutterBottom
-                                            align="center"
-                                          >
-                                            +{item.phone}
-                                          </Typography>
-                                        </Grid>
-                                      </MenuItem>
-                                      <Divider />
-                                    </div>
-                                  );
-                                }
-                                return null;
-                              })
-                            : null}
-                        </Menu>
-                      ) : null}
+                      {filterFunc(n) > 0 ? `${filterFunc(n)} Staffs` : 'No staffs'}
                     </TableCell>
-                    <TableCell className="p-4 md:p-16" component="td" scope="row" align="center">
-                      {n}
-                    </TableCell>
-                    {/* <TableCell className="p-4 md:p-16" component="td" scope="row" align="center">
-                      <Button
-                        variant="outlined"
-                        color="secondary"
-                        onClick={(e) => goGeofence(e, n)}
-                      >
-                        View geofence
-                      </Button>
-                    </TableCell> */}
                   </TableRow>
                 );
               })}

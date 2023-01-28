@@ -145,6 +145,7 @@ const AgendaPage = (props) => {
             selectMirror
             dayMaxEvents
             weekends
+            firstDay={1}
             datesSet={handleDates}
             events={events}
             eventContent={renderEventContent}
