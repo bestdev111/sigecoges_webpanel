@@ -10,19 +10,53 @@ export const doVerifyEmail = (email, password) => async (dispatch) => {
 
     return () => false;
   }
-  return firebaseService.auth.createUserWithEmailAndPassword(email, password).then((response) => {
-    console.log('response', response);
-    response.user.sendEmailVerification();
-    firebaseService.auth.signOut();
-    window.location.href = '/mail-confirm';
-    window.localStorage.setItem('mail-confirm', email);
-    // dispatch(
-    //   createUserSettingsFirebase({
-    //     ...response.user,
-    //     email,
-    //   })
-    // );
-  });
+  return firebaseService.auth
+    .createUserWithEmailAndPassword(email, password)
+    .then((response) => {
+      console.log('response', response);
+      response.user.sendEmailVerification();
+      firebaseService.auth.signOut();
+      window.location.href = '/mail-confirm';
+      window.localStorage.setItem('mail-confirm', email);
+      // dispatch(
+      //   createUserSettingsFirebase({
+      //     ...response.user,
+      //     email,
+      //   })
+      // );
+    })
+    .catch((error) => {
+      const usernameErrorCodes = [
+        'auth/operation-not-allowed',
+        'auth/user-not-found',
+        'auth/user-disabled',
+      ];
+      const emailErrorCodes = ['auth/email-already-in-use', 'auth/invalid-email'];
+      const passwordErrorCodes = ['auth/weak-password', 'auth/wrong-password'];
+      const response = [];
+      if (usernameErrorCodes.includes(error.code)) {
+        response.push({
+          type: 'username',
+          message: error.message,
+        });
+      }
+      if (emailErrorCodes.includes(error.code)) {
+        response.push({
+          type: 'email',
+          message: error.message,
+        });
+      }
+      if (passwordErrorCodes.includes(error.code)) {
+        response.push({
+          type: 'password',
+          message: error.message,
+        });
+      }
+      if (error.code === 'auth/invalid-api-key') {
+        dispatch(showMessage({ message: error.message }));
+      }
+      return dispatch(registerError(response));
+    });
 };
 
 export const registerWithFirebase = (model) => async (dispatch) => {

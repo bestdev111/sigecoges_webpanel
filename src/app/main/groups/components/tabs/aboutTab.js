@@ -1,3 +1,5 @@
+/* eslint-disable prefer-const */
+/* eslint-disable prettier/prettier */
 import { useEffect, useState } from 'react';
 import {
   AppBar,
@@ -25,35 +27,66 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const container = {
+  show: {
+    transition: {
+      staggerChildren: 0.05,
+    },
+  },
+};
+const item = {
+  hidden: { opacity: 0, y: 40 },
+  show: { opacity: 1, y: 0 },
+};
+
 function AboutTab(props) {
   const dispatch = useDispatch();
   const classes = useStyles();
   const [searchStaff, setSearchStaff] = useState('');
   const [viewUser, setViewUser] = useState(null);
+  const [staff, setStaff] = useState([]);
+  const [staffNum, setStaffNum] = useState(0);
   const userRole = useSelector(selectRole);
 
   useEffect(() => {
     dispatch(getUserRole(viewUser));
   }, [dispatch, viewUser]);
+  
+  // useEffect(() => {
+  //   if(staff && searchStaff.length > 0){
+  //     let temp = [];
+  //     staff.forEach(element => {
+  //       if(element.name.toLowerCase().includes(searchStaff.toLowerCase()) || element.phone.includes(searchStaff)){
+  //         temp.push(element);
+  //         console.log('temp1=>', temp);
+  //       }
+  //     });
+  //     setStaffNum(temp.length);
+  //     setStaff(temp);
+  //   }
+  // }, [dispatch, searchStaff]);
 
   useEffect(() => {
-    // dispatch(getUserRole(viewUser));
-    console.log('searchStaff=>', searchStaff);
-  }, [dispatch, searchStaff]);
-
-  const container = {
-    show: {
-      transition: {
-        staggerChildren: 0.05,
-      },
-    },
-  };
-
-  const item = {
-    hidden: { opacity: 0, y: 40 },
-    show: { opacity: 1, y: 0 },
-  };
-
+    if(props.userData && props.groupName) {
+      let temp = [];
+      props.userData.forEach(element => {
+        if(element.group_name === props.groupName && element.type === 'STAFF'){
+          if(searchStaff.length > 0) {
+            if(element.name.toLowerCase().includes(searchStaff.toLowerCase()) || element.phone.includes(searchStaff)) {
+              temp.push(element);
+            }
+          } else {
+            temp.push(element);
+          }
+          console.log('temp2=>', temp);
+        }
+      });
+      setStaff(temp);
+      setStaffNum(temp.length);
+    }
+  }, [props.userData, props.groupName, searchStaff]);
+  
+  console.log('searchStaff=>', staff);
   return (
     <motion.div variants={container} initial="hidden" animate="show">
       <div className="md:flex max-w-2xl">
@@ -72,11 +105,11 @@ function AboutTab(props) {
             </AppBar>
             <CardContent className="flex flex-wrap p-16">
               {props.userData
-                ? props.userData.map((user) => {
+                ? props.userData.map((user, index) => {
                     if (user.group_name === props.groupName && user.type === 'ADMIN') {
                       return (
                         <img
-                          key={user.id}
+                          key={index}
                           className={
                             user.id === viewUser
                               ? clsx(
@@ -100,13 +133,20 @@ function AboutTab(props) {
           </Card>
           <Card component={motion.div} variants={item} className="w-full mb-32 rounded-16 shadow">
             <AppBar position="static" elevation={0}>
-              <Toolbar className="px-8 flex justify-between">
+              <Toolbar className="w-full px-8 flex justify-between">
                 <Typography
                   variant="subtitle1"
                   color="inherit"
                   className="flex-1 px-12 font-medium"
                 >
                   Staffs
+                </Typography>
+                <Typography
+                  variant="subtitle1"
+                  color="inherit"
+                  className="flex justify-end flex-1 px-12 font-medium"
+                >
+                  {staffNum} Staffs
                 </Typography>
               </Toolbar>
             </AppBar>
@@ -123,31 +163,33 @@ function AboutTab(props) {
                   />
                 </Grid>
               </Grid>
-              {props.userData
-                ? props.userData.map((user) => {
-                    if (user.group_name === props.groupName && user.type === 'STAFF') {
-                      return (
-                        <img
-                          key={user.id}
-                          className={
-                            user.id === viewUser
-                              ? clsx(
-                                  classes.active,
-                                  'object-cover w-64 m-4 rounded-16 block cursor-pointer'
-                                )
-                              : clsx(
-                                  classes.avatar,
-                                  'object-cover w-64 m-4 rounded-16 block cursor-pointer'
-                                )
-                          }
-                          src={user.photo}
-                          alt={user.name}
-                          onClick={() => setViewUser(user.id)}
-                        />
-                      );
-                    }
-                  })
-                : null}
+              <Grid className='flex overflow-y-scroll'>
+                {staff
+                  ? staff.map((user) => {
+                      if (user.group_name === props.groupName && user.type === 'STAFF') {
+                        return (
+                          <img
+                            key={user.id}
+                            className={
+                              user.id === viewUser
+                                ? clsx(
+                                    classes.active,
+                                    'object-cover w-64 m-4 rounded-16 block cursor-pointer'
+                                  )
+                                : clsx(
+                                    classes.avatar,
+                                    'object-cover w-64 m-4 rounded-16 block cursor-pointer'
+                                  )
+                            }
+                            src={user.photo}
+                            alt={user.name}
+                            onClick={() => setViewUser(user.id)}
+                          />
+                        );
+                      }
+                    })
+                  : <>No Staff</>}
+              </Grid>
             </CardContent>
           </Card>
         </div>
