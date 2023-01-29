@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint import/no-extraneous-dependencies: off */
 import { createSlice } from '@reduxjs/toolkit';
 import firebase from 'firebase/app';
@@ -27,20 +28,42 @@ export const setUserDataFirebase = (user, authUser) => async (dispatch) => {
 
 export const createUserSettingsFirebase = (authUser) => async (dispatch, getState) => {
   const guestUser = getState().auth.user;
+  const user_Data = firebase.database.ref('tbl_user').on('value', async (snapshot) => {
+    if (snapshot.val() !== null) {
+      const userData = {};
+      for (const key in snapshot.val()) {
+        if (Object.hasOwnProperty.call(snapshot.val(), key)) {
+          const element = snapshot.val()[key];
+          if (element.phone === authUser.phone) {
+            userData.key = key;
+            userData.data = element;
+          }
+        }
+      }
+      // const user = _.mapValues(snapshot.val(), (item) => {
+      //   if (item.phone === authUser.phone) {
+      //     return item;
+      //   }
+      // });
+      return userData;
+    }
+  });
   const fuseDefaultSettings = getState().fuse.settings.defaults;
   const { currentUser } = firebase.auth();
-
+  console.log('USERSLICE==>', user_Data, currentUser);
   /**
    * Merge with current Settings
    */
-  const user = _.merge({}, guestUser, {
-    uid: authUser.uid,
-    role: ['admin'],
+  const user = _.merge({}, user_Data.data, {
+    uid: user_Data.key,
+    type: 'ADMIN',
+    email: authUser.email,
+    password: authUser.password,
     data: {
-      email: authUser.email,
       settings: { ...fuseDefaultSettings },
     },
   });
+  console.log('USERSLICE User==>', user);
   currentUser.updateProfile(user.data);
 
   dispatch(updateUserData(user));
@@ -104,7 +127,7 @@ export const logoutUser = () => async (dispatch, getState) => {
 };
 
 export const updateUserData = (user) => async (dispatch, getState) => {
-  if (!user.role || user.role.length === 0) {
+  if (!user.type || user.type.length === 0) {
     // is guest
     return;
   }
@@ -119,10 +142,9 @@ export const updateUserData = (user) => async (dispatch, getState) => {
 };
 
 const initialState = {
-  role: [], // guest
+  type: [], // guest
   data: {
-    photoURL: 'assets/images/avatars/Velazquez.jpg',
-    // email: 'johndoe@withinpixels.com',
+    photoURL: 'assets/images/avatars/profile.jpg',
   },
 };
 

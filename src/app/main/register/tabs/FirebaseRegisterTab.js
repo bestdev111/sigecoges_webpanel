@@ -25,7 +25,7 @@ const schema = yup.object().shape({
   // passwordConfirm: yup.string().oneOf([yup.ref('password'), null], 'Passwords must match'),
 });
 
-const defaultValues = {
+let defaultValues = {
   phone: '',
   email: '',
   password: '',
@@ -36,10 +36,10 @@ function FirebaseRegisterTab(props) {
   const dispatch = useDispatch();
   const authRegister = useSelector(({ auth }) => auth.register);
 
-  const [verifiedEmail, setVerifiedEmail] = useState(false);
+  const [verifiedEmail, setVerifiedEmail] = useState('');
   const [isFormValid, setIsFormValid] = useState(false);
   const formRef = useRef(null);
-  const { control, formState, handleSubmit, reset, setError } = useForm({
+  const { control, formState, handleSubmit, reset, setError, setValue } = useForm({
     mode: 'onChange',
     defaultValues,
     resolver: yupResolver(schema),
@@ -55,6 +55,26 @@ function FirebaseRegisterTab(props) {
       });
     });
   }, [authRegister.errors, setError]);
+
+  useEffect(() => {
+    if (
+      window.localStorage.getItem('mail-confirm') &&
+      window.localStorage.getItem('mailchimp') === 'auth'
+    ) {
+      setVerifiedEmail(window.localStorage.getItem('mail-confirm'));
+      const {
+        phone = '',
+        email = '',
+        password = '',
+      } = { phone: '', email: window.localStorage.getItem('mail-confirm'), password: '12345678' };
+      defaultValues = { phone, password, email };
+      _.mapValues(defaultValues, (value, key) => setValue(key, value));
+      // reset({ name: 'email', value: window.localStorage.getItem('mail-confirm') });
+      // setValue('name', window.localStorage.getItem('mail-confirm'), {
+      //   shouldValidate: true,
+      // });
+    }
+  }, [window.localStorage.getItem('mail-confirm'), window.localStorage.getItem('mailchimp')]);
 
   function onSubmit(model) {
     dispatch(registerWithFirebase(model));
@@ -80,14 +100,14 @@ function FirebaseRegisterTab(props) {
                 {...field}
                 className="mb-16"
                 type="text"
-                disabled={verifiedEmail}
+                disabled={verifiedEmail.length > 0}
                 error={!!errors.email}
                 helperText={errors?.email?.message}
                 label="Email"
                 InputProps={{
                   endAdornment: (
                     <InputAdornment position="end">
-                      {verifiedEmail ? (
+                      {verifiedEmail.length > 0 ? (
                         <Icon className="text-20" color="action">
                           mark_email_read
                         </Icon>
@@ -114,7 +134,7 @@ function FirebaseRegisterTab(props) {
               className="mb-16"
               type="password"
               label="Password"
-              disabled={verifiedEmail}
+              disabled={verifiedEmail.length > 0}
               error={!!errors.password}
               helperText={errors?.password?.message}
               InputProps={{
@@ -134,7 +154,7 @@ function FirebaseRegisterTab(props) {
             />
           )}
         />
-        {!verifiedEmail ? (
+        {!verifiedEmail.length > 0 ? (
           <Button
             type="button"
             variant="contained"
@@ -159,7 +179,7 @@ function FirebaseRegisterTab(props) {
                 type="text"
                 label="Phone Number"
                 placeholder="+2251234567890"
-                disabled={!verifiedEmail}
+                disabled={!verifiedEmail.length > 0}
                 error={!!errors.phone}
                 helperText={errors?.phone?.message}
                 InputProps={{

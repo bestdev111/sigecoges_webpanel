@@ -29,6 +29,10 @@ const MailConfirmPageConfig = {
       path: '/mail-confirm',
       component: lazy(() => import('./MailConfirmPage')),
     },
+    {
+      path: '/auth-link',
+      component: lazy(() => import('./EmailLinkAuthPage')),
+    },
   ],
 };
 

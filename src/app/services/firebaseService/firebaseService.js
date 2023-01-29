@@ -86,7 +86,7 @@ class FirebaseService {
     if (!firebase.apps.length) {
       return false;
     }
-    return this.db.ref(`users/${user.uid}`).set(user);
+    return this.db.ref(`tbl_user/${user.uid}`).set(user);
   };
 
   onAuthStateChanged = (callback) => {

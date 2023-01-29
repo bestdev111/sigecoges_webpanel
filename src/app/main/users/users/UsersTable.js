@@ -35,19 +35,8 @@ const StyledBadge0 = withStyles((theme) => ({
       width: '100%',
       height: '100%',
       borderRadius: '50%',
-      animation: '$ripple 1.2s infinite ease-in-out',
       border: '1px solid currentColor',
       content: '""',
-    },
-  },
-  '@keyframes ripple': {
-    '0%': {
-      transform: 'scale(.8)',
-      opacity: 1,
-    },
-    '100%': {
-      transform: 'scale(2.4)',
-      opacity: 0,
     },
   },
 }))(Badge);
@@ -63,19 +52,8 @@ const StyledBadge1 = withStyles((theme) => ({
       width: '100%',
       height: '100%',
       borderRadius: '50%',
-      animation: '$ripple 1.2s infinite ease-in-out',
       border: '1px solid currentColor',
       content: '""',
-    },
-  },
-  '@keyframes ripple': {
-    '0%': {
-      transform: 'scale(.8)',
-      opacity: 1,
-    },
-    '100%': {
-      transform: 'scale(2.4)',
-      opacity: 0,
     },
   },
 }))(Badge);
@@ -91,19 +69,8 @@ const StyledBadge2 = withStyles((theme) => ({
       width: '100%',
       height: '100%',
       borderRadius: '50%',
-      animation: '$ripple 1.2s infinite ease-in-out',
       border: '1px solid currentColor',
       content: '""',
-    },
-  },
-  '@keyframes ripple': {
-    '0%': {
-      transform: 'scale(.8)',
-      opacity: 1,
-    },
-    '100%': {
-      transform: 'scale(2.4)',
-      opacity: 0,
     },
   },
 }))(Badge);
@@ -249,43 +216,8 @@ function UsersTable(props) {
                       padding="none"
                       align="left"
                     >
-                      {n.photo ? (
-                        n.status === 1 ? (
-                          <StyledBadge1
-                            overlap="circular"
-                            anchorOrigin={{
-                              vertical: 'bottom',
-                              horizontal: 'right',
-                            }}
-                            variant="dot"
-                          >
-                            <Avatar alt={n.name} src={n.photo} />
-                          </StyledBadge1>
-                        ) : n.status === 0 ? (
-                          <StyledBadge0
-                            overlap="circular"
-                            anchorOrigin={{
-                              vertical: 'bottom',
-                              horizontal: 'right',
-                            }}
-                            variant="dot"
-                          >
-                            <Avatar alt={n.name} src={n.photo} />
-                          </StyledBadge0>
-                        ) : (
-                          <StyledBadge2
-                            overlap="circular"
-                            anchorOrigin={{
-                              vertical: 'bottom',
-                              horizontal: 'right',
-                            }}
-                            variant="dot"
-                          >
-                            <Avatar alt={n.name} src={n.photo} />
-                          </StyledBadge2>
-                        )
-                      ) : (
-                        <StyledBadge
+                      {n.status === 1 ? (
+                        <StyledBadge1
                           overlap="circular"
                           anchorOrigin={{
                             vertical: 'bottom',
@@ -295,9 +227,37 @@ function UsersTable(props) {
                         >
                           <Avatar
                             alt={n.name}
-                            src="assets/images/ecommerce/product-image-placeholder.png"
+                            src={n.photo ? n.photo : 'assets/images/avatars/profile.jpg'}
                           />
-                        </StyledBadge>
+                        </StyledBadge1>
+                      ) : n.status === 0 ? (
+                        <StyledBadge0
+                          overlap="circular"
+                          anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'right',
+                          }}
+                          variant="dot"
+                        >
+                          <Avatar
+                            alt={n.name}
+                            src={n.photo ? n.photo : 'assets/images/avatars/profile.jpg'}
+                          />
+                        </StyledBadge0>
+                      ) : (
+                        <StyledBadge2
+                          overlap="circular"
+                          anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'right',
+                          }}
+                          variant="dot"
+                        >
+                          <Avatar
+                            alt={n.name}
+                            src={n.photo ? n.photo : 'assets/images/avatars/profile.jpg'}
+                          />
+                        </StyledBadge2>
                       )}
                     </TableCell>
 
