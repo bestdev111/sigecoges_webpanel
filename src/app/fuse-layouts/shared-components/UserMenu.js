@@ -33,8 +33,8 @@ function UserMenu(props) {
             {user.data.displayName}
           </Typography>
           <Typography className="text-11 font-medium capitalize" color="textSecondary">
-            {user.role.toString()}
-            {(!user.role || (Array.isArray(user.role) && user.role.length === 0)) && 'Guest'}
+            {user.type.toString()}
+            {(!user.type || (Array.isArray(user.type) && user.type.length === 0)) && 'Guest'}
           </Typography>
         </div>
 
@@ -61,7 +61,7 @@ function UserMenu(props) {
           paper: 'py-8',
         }}
       >
-        {!user.role || user.role.length === 0 ? (
+        {!user.type || user.type.length === 0 ? (
           <>
             <MenuItem component={Link} to="/login" role="button">
               <ListItemIcon className="min-w-40">
