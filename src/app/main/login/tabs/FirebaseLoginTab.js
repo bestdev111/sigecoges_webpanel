@@ -128,25 +128,10 @@ function FirebaseLoginTab(props) {
           color="primary"
           className="w-full mx-auto mt-16"
           aria-label="LOG IN"
-          // disabled={_.isEmpty(dirtyFields) || !isValid}
           value="firebase"
         >
           Login
         </Button>
-        {/* {loading ? (
-        ) : (
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            className="w-full mx-auto mt-16"
-            aria-label="LOG IN"
-            // disabled={_.isEmpty(dirtyFields) || !isValid}
-            value="firebase"
-          >
-            <CircularProgress />
-          </Button>
-        )} */}
       </form>
     </div>
   );

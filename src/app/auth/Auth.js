@@ -21,7 +21,6 @@ class Auth extends Component {
     });
   }
 
-
   firebaseCheck = () =>
     new Promise((resolve) => {
       firebaseService.init((success) => {
@@ -33,7 +32,7 @@ class Auth extends Component {
       firebaseService.onAuthStateChanged((authUser) => {
         if (authUser) {
           this.props.showMessage({ message: 'Logging ...' });
-
+          console.log('here', authUser.uid);
           /**
            * Retrieve user data from Firebase
            */

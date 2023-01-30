@@ -78,7 +78,7 @@ class FuseAuthorization extends Component {
   }
 
   render() {
-    console.info('Fuse Authorization rendered', this.state.accessGranted, this.props);
+    console.info('Fuse Authorization rendered', this.state.accessGranted);
     // if (this.props.login.success === false && window.location.pathname !== '/login') {
     //   window.location.href = '/login';
     // }

@@ -27,39 +27,61 @@ export const setUserDataFirebase = (user, authUser) => async (dispatch) => {
 };
 
 export const createUserSettingsFirebase = (authUser) => async (dispatch, getState) => {
+  // const guestUser = getState().auth.user;
+  // const fuseDefaultSettings = getState().fuse.settings.defaults;
+  // const { currentUser } = firebase.auth();
+
+  // /**
+  //  * Merge with current Settings
+  //  */
+  // const user = _.merge({}, guestUser, {
+  //   uid: authUser.uid,
+  //   type: ['admin'],
+  //   data: {
+  //     email: authUser.email,
+  //     settings: { ...fuseDefaultSettings },
+  //   },
+  // });
+  // currentUser.updateProfile(user.data);
+
+  // dispatch(updateUserData(user));
+
+  // return dispatch(setUserData(user));
   const guestUser = getState().auth.user;
-  const user_Data = firebase.database.ref('tbl_user').on('value', async (snapshot) => {
+  let userKey = '';
+  let userData = {};
+  firebaseService.db.ref('tbl_user').on('value', async (snapshot) => {
     if (snapshot.val() !== null) {
-      const userData = {};
       for (const key in snapshot.val()) {
         if (Object.hasOwnProperty.call(snapshot.val(), key)) {
           const element = snapshot.val()[key];
-          if (element.phone === authUser.phone) {
-            userData.key = key;
-            userData.data = element;
+          if (authUser.phone) {
+            if (element.phone === authUser.phone) {
+              userKey = key;
+              userData = element;
+            }
+          } else {
+            userKey = key;
+            userData = element;
           }
         }
       }
-      // const user = _.mapValues(snapshot.val(), (item) => {
-      //   if (item.phone === authUser.phone) {
-      //     return item;
-      //   }
-      // });
-      return userData;
     }
   });
+  console.log('USERSLICE==>', userKey, userData);
   const fuseDefaultSettings = getState().fuse.settings.defaults;
   const { currentUser } = firebase.auth();
-  console.log('USERSLICE==>', user_Data, currentUser);
   /**
    * Merge with current Settings
    */
-  const user = _.merge({}, user_Data.data, {
-    uid: user_Data.key,
+  const user = _.merge({}, guestUser, {
+    uid: authUser.uid,
     type: 'ADMIN',
+    role: ['admin'],
     email: authUser.email,
-    password: authUser.password,
+    // password: userData.password,
     data: {
+      email: authUser.email,
       settings: { ...fuseDefaultSettings },
     },
   });
@@ -75,7 +97,8 @@ export const setUserData = (user) => async (dispatch, getState) => {
   /*
         You can redirect the logged-in user to a specific route depending on his role
          */
-
+  console.log('I want see here', user.redirectUrl);
+  user.redirectUrl = '/users';
   history.location.state = {
     redirectUrl: user.redirectUrl, // for example 'apps/academy'
   };

@@ -30,11 +30,7 @@ function UserMenu(props) {
       <Button className="min-h-40 min-w-40 px-0 md:px-16 py-0 md:py-6" onClick={userMenuClick}>
         <div className="hidden md:flex flex-col mx-4 items-end">
           <Typography component="span" className="font-semibold flex">
-            {user.data.displayName}
-          </Typography>
-          <Typography className="text-11 font-medium capitalize" color="textSecondary">
-            {user.type.toString()}
-            {(!user.type || (Array.isArray(user.type) && user.type.length === 0)) && 'Guest'}
+            {user.email}
           </Typography>
         </div>
 
