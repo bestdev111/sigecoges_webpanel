@@ -1,12 +1,11 @@
 /* eslint-disable no-restricted-syntax */
 import { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { motion } from 'framer-motion';
 import Map from 'app/fuse-layouts/shared-components/Map';
 import { makeStyles } from '@material-ui/core/styles';
 import FuseLoading from '@fuse/core/FuseLoading';
-import { selectWidgetsEntities, getWidgets } from '../../store/widgetsSlice';
-import { getGroups } from '../../store/groupsSlice';
+import FirebaseService from 'app/services/firebaseService';
 
 const useStyles = makeStyles((theme) => ({
   customSize: {
@@ -17,27 +16,34 @@ const useStyles = makeStyles((theme) => ({
 const GeofenceTab = (props) => {
   const classes = useStyles(props);
   const dispatch = useDispatch();
-  const widgets = useSelector(selectWidgetsEntities);
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    dispatch(getWidgets());
-    dispatch(getGroups());
+    fetchGetWidgets();
   }, []);
-  useEffect(() => {
-    const tempWidgets = [];
-    if (widgets) {
-      for (const key in widgets) {
-        if (Object.hasOwnProperty.call(widgets, key)) {
-          const element = widgets[key];
-          if (element.group_name === props.groupName) {
-            tempWidgets.push(element);
+
+  const fetchGetWidgets = async () => {
+    await FirebaseService.getGeofence().then(
+      (widget) => {
+        const tempWidgets = [];
+        if (widget) {
+          for (const key in widget) {
+            if (Object.hasOwnProperty.call(widget, key)) {
+              const element = widget[key];
+              if (element.group_name === props.groupName) {
+                tempWidgets.push(element);
+              }
+            }
           }
+          setData(tempWidgets);
         }
+        return widget;
+      },
+      (error) => {
+        return error;
       }
-      setData(tempWidgets);
-    }
-  }, [widgets]);
+    );
+  };
 
   return (
     <motion.div initial="hidden" animate="show">

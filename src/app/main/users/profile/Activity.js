@@ -17,9 +17,8 @@ import {
 import { motion } from 'framer-motion';
 import { DatePicker } from '@material-ui/pickers';
 import { makeStyles } from '@material-ui/core/styles';
-import { useDispatch, useSelector } from 'react-redux';
-import { getUserActivity, selectActivity } from '../store/activitySlice';
-import { getUserGeofence, selectGeofence } from '../store/geofenceSlice';
+import { useDispatch } from 'react-redux';
+import firebaseService from 'app/services/firebaseService';
 
 const formatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -86,8 +85,8 @@ function Activity(props) {
   const [totalHours, setTotalHours] = useState(0);
   const [totalSalary, setTotalSalary] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const activityData = useSelector(selectActivity);
-  const geofenceData = useSelector(selectGeofence);
+  const [activityData, setActivityData] = useState();
+  const [geofenceData, setGeofenceData] = useState();
 
   useEffect(() => {
     if (props.uid) {
@@ -95,26 +94,50 @@ function Activity(props) {
         uid: props.uid,
         date: selectedDate,
       };
-      dispatch(getUserActivity(data));
-      dispatch(getUserGeofence());
+      fetchUserAcitivity(data);
+      fetchUserGeofence(data);
     }
   }, [selectedDate, props.uid]);
+
+  const fetchUserAcitivity = async (data) => {
+    await firebaseService.getUserActivity(data).then(
+      (result) => {
+        setActivityData(result);
+        return result;
+      },
+      (error) => {
+        return error;
+      }
+    );
+  };
+  const fetchUserGeofence = async () => {
+    await firebaseService.getUserGeofence().then(
+      (result) => {
+        setGeofenceData(result);
+        return result;
+      },
+      (error) => {
+        return error;
+      }
+    );
+  };
+
   useEffect(() => {
     if (
       activityData !== [] &&
-      activityData[0] !== undefined &&
+      activityData !== undefined &&
       geofenceData &&
       geofenceData !== undefined
     ) {
       let tempHours = 0;
-      activityData[0].forEach((element) => {
+      activityData.forEach((element) => {
         tempHours += element.hours;
       });
       const rate = props.rate === undefined || props.rate === null ? 0 : props.rate;
       const salary = props.salary === undefined || props.salary === null ? 0 : props.salary;
       setTotalSalary(Number(tempHours) * Number(rate) + Number(salary));
       setTotalHours(tempHours);
-      const activities = activityFunc(activityData[0], geofenceData[0]);
+      const activities = activityFunc(activityData, geofenceData);
       setRows(activities);
     }
   }, [activityData, geofenceData]);
@@ -136,7 +159,6 @@ function Activity(props) {
     hidden: { opacity: 0, y: 40 },
     show: { opacity: 1, y: 0 },
   };
-
   return (
     <motion.div variants={container} initial="hidden" animate="show">
       <div className="md:flex max-w-2xl">

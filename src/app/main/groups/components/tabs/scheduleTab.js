@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import { Typography } from '@material-ui/core';
 import clsx from 'clsx';
@@ -8,15 +7,19 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import FirebaseService from 'app/services/firebaseService';
+import formatISO from 'date-fns/formatISO';
+import CoreService from 'app/services/coreService';
 import CalendarHeader from './CalendarHeader';
 import EventDialog from './EventDialog';
-import {
-  selectEvents,
-  openNewEventDialog,
-  openEditEventDialog,
-  updateEvent,
-  getEvents,
-} from '../../store/scheduleSlice';
+
+// import {
+//   selectEvents,
+//   openNewEventDialog,
+//   openEditEventDialog,
+//   updateEvent,
+//   getEvents,
+// } from '../../store/scheduleSlice';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -76,53 +79,69 @@ const useStyles = makeStyles((theme) => ({
 
 function ScheduleTab(props) {
   const [currentDate, setCurrentDate] = useState();
-  const dispatch = useDispatch();
-  const events = useSelector(selectEvents);
+  // const dispatch = useDispatch();
+  const [events, setEvents] = useState();
+  const [open, setOpen] = useState(false);
+  const [openId, setOpenId] = useState();
+  // const events = useSelector(selectEvents);
   const calendarRef = useRef();
 
   const classes = useStyles(props);
   const headerEl = useRef(null);
 
   useEffect(() => {
-    if (props.groupName) dispatch(getEvents(props.groupName));
+    // if (props.groupName) dispatch(getEvents(props.groupName));
+    if (props.groupName) fetchGetEvents(props.groupName);
   }, []);
 
-  const handleDateSelect = (selectInfo) => {
-    const { start, end } = selectInfo;
-
-    dispatch(
-      openNewEventDialog({
-        start,
-        end,
-      })
+  const fetchGetEvents = async (groupName) => {
+    FirebaseService.getSchedules(groupName).then(
+      (schedule) => {
+        // eslint-disable-next-line prefer-const
+        let temp = [];
+        if (schedule && schedule[0] !== undefined) {
+          schedule.forEach((element, index) => {
+            // if (element.type === 'SPECIFIC') {
+            // eslint-disable-next-line prefer-const
+            let obj = {
+              id: index,
+              title: element.content,
+              start: formatISO(new Date(element.specific_date.time)),
+              end: formatISO(new Date(element.specific_date.time)),
+              allDay: false,
+              d: CoreService.getDateStringFromTimestamp(element.specific_date.time),
+              isOnDuty: element.isOnDuty,
+              type: element.type,
+              sTime: element.start_time,
+              eTime: element.end_time,
+            };
+            temp.push(obj);
+            // }
+          });
+        }
+        setEvents(temp);
+        return temp;
+      },
+      (error) => {
+        return error;
+      }
     );
   };
 
-  const handleEventDrop = (eventDropInfo) => {
-    const { id, title, allDay, start, end, extendedProps } = eventDropInfo.event;
-    dispatch(
-      updateEvent({
-        id,
-        title,
-        allDay,
-        start,
-        end,
-        extendedProps,
-      })
-    );
-  };
   const handleEventClick = (clickInfo) => {
     const { id, title, allDay, start, end, extendedProps } = clickInfo.event;
-    dispatch(
-      openEditEventDialog({
-        id,
-        title,
-        allDay,
-        start,
-        end,
-        extendedProps,
-      })
-    );
+    setOpen(true);
+    setOpenId(id);
+    // dispatch(
+    //   openEditEventDialog({
+    //     id,
+    //     title,
+    //     allDay,
+    //     start,
+    //     end,
+    //     extendedProps,
+    //   })
+    // );
   };
 
   const handleDates = (rangeInfo) => {
@@ -134,7 +153,9 @@ function ScheduleTab(props) {
   const handleEventChange = (changeInfo) => {};
 
   const handleEventRemove = (removeInfo) => {};
-
+  const eventClose = () => {
+    setOpen(false);
+  };
   return (
     <div className={clsx(classes.root, 'flex flex-col flex-auto relative')}>
       <CalendarHeader calendarRef={calendarRef} currentDate={currentDate} />
@@ -149,7 +170,7 @@ function ScheduleTab(props) {
             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
             headerToolbar={false}
             initialView="dayGridMonth"
-            // editable
+            editable
             // selectable
             // selectMirror
             dayMaxEvents
@@ -168,27 +189,12 @@ function ScheduleTab(props) {
           />
         </motion.div>
 
-        {/* <motion.div
-          className={classes.addButton}
-          initial={{ scale: 0 }}
-          animate={{ scale: 1, transition: { delay: 0.4 } }}
-        >
-          <Fab
-            color="secondary"
-            aria-label="add"
-            onClick={() =>
-              dispatch(
-                openNewEventDialog({
-                  start: new Date(),
-                  end: new Date(),
-                })
-              )
-            }
-          >
-            <Icon>add</Icon>
-          </Fab>
-        </motion.div> */}
-        <EventDialog />
+        <EventDialog
+          open={open}
+          openId={openId}
+          groupName={props.groupName}
+          closeFunc={eventClose}
+        />
       </div>
     </div>
   );

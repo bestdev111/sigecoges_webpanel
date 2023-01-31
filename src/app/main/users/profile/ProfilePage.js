@@ -1,17 +1,16 @@
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import FusePageSimple from '@fuse/core/FusePageSimple';
-import FuseNavBadge from '@fuse/core/FuseNavigation/FuseNavBadge';
 import { makeStyles } from '@material-ui/core/styles';
-import { Typography, Grid, Avatar, Icon } from '@material-ui/core';
-import { motion } from 'framer-motion';
 import withReducer from 'app/store/withReducer';
+import firebaseService from 'app/services/firebaseService';
+import { Typography, Icon, Avatar, Grid } from '@material-ui/core';
+import { motion } from 'framer-motion';
 import clsx from 'clsx';
+import FuseNavBadge from '@fuse/core/FuseNavigation/FuseNavBadge';
 import reducer from '../store';
 import Activity from './Activity';
-import { getUserProfile, selectProfile } from '../store/profileSlice';
-import { getUserRole, selectRole } from '../store/roleSlice';
 
 const useStyles = makeStyles((theme) => ({
   avatar: {
@@ -47,15 +46,39 @@ function ProfilePage() {
   const routeParams = useParams();
   const classes = useStyles();
   // const user = useSelector(({ auth }) => auth.user);
-  const selectedUser = useSelector(selectProfile);
-  const selectedRole = useSelector(selectRole);
+  const [userData, setUserData] = useState();
+  const [userRole, setUserRole] = useState();
   useEffect(() => {
     const { userId } = routeParams;
     if (userId) {
-      dispatch(getUserProfile(userId));
-      dispatch(getUserRole(userId));
+      fetchUserData(userId);
+      fetchUserRole(userId);
     }
   }, [dispatch, routeParams]);
+
+  const fetchUserData = async (id) => {
+    await firebaseService.getUserData(id).then(
+      (user) => {
+        setUserData(user);
+        return user;
+      },
+      (error) => {
+        return error;
+      }
+    );
+  };
+  const fetchUserRole = async (id) => {
+    const response = await firebaseService.getUserRole(id).then(
+      (user) => {
+        setUserRole(user);
+        return user;
+      },
+      (error) => {
+        return error;
+      }
+    );
+  };
+
   return (
     <FusePageSimple
       classes={{
@@ -72,7 +95,7 @@ function ProfilePage() {
             <motion.div initial={{ scale: 0 }} animate={{ scale: 1, transition: { delay: 0.1 } }}>
               <Avatar
                 className={clsx(classes.avatar, '-mt-128  w-128 h-128')}
-                src={selectedUser[0] ? selectedUser[0].photo : 'assets/images/avatars/profile.jpg'}
+                src={userData ? userData.photo : 'assets/images/avatars/profile.jpg'}
               />
             </motion.div>
             <div className="flex flex-col md:flex-row flex-1 items-left justify-between p-8">
@@ -80,7 +103,7 @@ function ProfilePage() {
                 initial={{ opacity: 0, x: -40 }}
                 animate={{ opacity: 1, x: 0, transition: { delay: 0.2 } }}
               >
-                {selectedUser && selectedRole ? (
+                {userData && userRole ? (
                   <>
                     <Grid container className="pb-10">
                       <Grid item>
@@ -89,22 +112,22 @@ function ProfilePage() {
                           variant="h4"
                           color="inherit"
                         >
-                          {selectedUser[0] ? selectedUser[0].name : 'guest'}
+                          {userData ? userData.name : 'guest'}
                         </Typography>
                       </Grid>
                       <Grid item className={classes.badge}>
-                        {selectedUser[0] ? (
+                        {userData ? (
                           <FuseNavBadge
                             className="mx-4"
                             badge={
-                              selectedUser[0].type === 'ADMIN'
+                              userData.type === 'ADMIN'
                                 ? {
-                                    title: selectedUser[0].type,
+                                    title: userData.type,
                                     bg: '#F44336',
                                     fg: '#FFFFFF',
                                   }
                                 : {
-                                    title: selectedUser[0].type,
+                                    title: userData.type,
                                     bg: '#ff6f00',
                                     fg: '#FFFFFF',
                                   }
@@ -124,7 +147,7 @@ function ProfilePage() {
                           call
                         </Icon>
                         <Typography variant="h6" gutterBottom>
-                          {selectedUser[0] ? `+${selectedUser[0].phone}` : ''}
+                          {userData ? `+${userData.phone}` : ''}
                         </Typography>
                       </Grid>
                       <Grid item xs={6} className="flex">
@@ -137,7 +160,7 @@ function ProfilePage() {
                           groups
                         </Icon>
                         <Typography variant="h6" gutterBottom>
-                          {selectedUser[0] ? selectedUser[0].group_name : ''}
+                          {userData ? userData.group_name : ''}
                         </Typography>
                       </Grid>
                       <Grid item xs={6} className="flex">
@@ -150,8 +173,8 @@ function ProfilePage() {
                           alarm_on
                         </Icon>
                         <Typography variant="h6" gutterBottom>
-                          {selectedUser[0] && selectedUser[0].rate !== undefined
-                            ? `${selectedUser[0].rate} XOF/hour`
+                          {userData && userData.rate !== undefined
+                            ? `${userData.rate} XOF/hour`
                             : null}
                         </Typography>
                       </Grid>
@@ -165,7 +188,7 @@ function ProfilePage() {
                           info
                         </Icon>
                         <Typography variant="h6" gutterBottom>
-                          {selectedUser[0] ? selectedUser[0].info : null}
+                          {userData ? userData.info : null}
                         </Typography>
                       </Grid>
                       <Grid item xs={6} className="flex">
@@ -178,7 +201,7 @@ function ProfilePage() {
                           how_to_reg
                         </Icon>
                         <Typography variant="h6" gutterBottom>
-                          {selectedRole[0] ? selectedRole[0].name : null}
+                          {userRole ? userRole.name : null}
                         </Typography>
                       </Grid>
                       <Grid item xs={6} className="flex">
@@ -191,8 +214,8 @@ function ProfilePage() {
                           monetization_on
                         </Icon>
                         <Typography variant="h6" gutterBottom>
-                          {selectedRole[0] && selectedRole[0].salary !== undefined
-                            ? `${selectedRole[0].salary} XOF`
+                          {userRole && userRole.salary !== undefined
+                            ? `${userRole.salary} XOF`
                             : null}
                         </Typography>
                       </Grid>
@@ -206,12 +229,8 @@ function ProfilePage() {
       }
       content={
         <div className="p-16 sm:p-24">
-          {selectedUser[0] && selectedRole[0] ? (
-            <Activity
-              uid={selectedUser[0].id}
-              rate={selectedUser[0].rate}
-              salary={selectedRole[0].salary}
-            />
+          {userData && userRole ? (
+            <Activity uid={userData.id} rate={userData.rate} salary={userRole.salary} />
           ) : null}
         </div>
       }

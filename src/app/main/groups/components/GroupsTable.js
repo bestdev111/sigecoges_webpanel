@@ -71,7 +71,6 @@ function GroupsTable(props) {
   }, [userData, searchText]);
 
   useEffect(() => {
-    const tempGroups = [];
     if (data[0] !== undefined) {
       const groupList = CoreService.getGroupList(data[0]);
       setGroupsList(groupList);

@@ -1,7 +1,7 @@
 import { createEntityAdapter, createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-import formatISO from 'date-fns/formatISO';
 import FirebaseService from 'app/services/firebaseService';
+import formatISO from 'date-fns/formatISO';
 import CoreService from 'app/services/coreService';
 
 export const dateFormat = 'YYYY-MM-DDTHH:mm:ss.sssZ';

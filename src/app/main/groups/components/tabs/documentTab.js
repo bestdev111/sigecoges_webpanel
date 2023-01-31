@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Table, TableHead, TableCell, TableBody, TableRow, Icon } from '@material-ui/core';
+import { Table, TableHead, TableCell, TableBody, TableRow, Icon, Avatar } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import clsx from 'clsx';
-import { selectDocs, getDocs } from '../../store/docsSlice';
-import { selectGroups, getGroups } from '../../store/groupsSlice';
+import firebaseService from 'app/services/firebaseService';
 
 const useStyles = makeStyles({
   typeIcon: {
@@ -80,19 +79,25 @@ const list = [
   'xlsx',
 ];
 
-const DocumentTab = () => {
+const DocumentTab = (props) => {
   const dispatch = useDispatch();
   const classes = useStyles();
   const [documents, setDocuments] = useState();
-  const docData = useSelector(selectDocs);
-  const allUserData = useSelector(selectGroups);
   useEffect(() => {
-    dispatch(getDocs());
-    dispatch(getGroups());
+    fetchGetDocs();
   }, []);
-  useEffect(() => {
-    setDocuments(docData);
-  }, [docData]);
+
+  const fetchGetDocs = async () => {
+    await firebaseService.getDocs().then(
+      (docs) => {
+        setDocuments(docs);
+        return docs;
+      },
+      (error) => {
+        return error;
+      }
+    );
+  };
   return (
     <motion.div
       initial={{ y: 50, opacity: 0.8 }}
@@ -111,8 +116,8 @@ const DocumentTab = () => {
         </TableHead>
 
         <TableBody>
-          {documents && documents[0]
-            ? documents[0].map((docs, index) => {
+          {documents
+            ? documents.map((docs, index) => {
                 if (list.includes(docs.type)) {
                   return (
                     <TableRow
@@ -128,12 +133,18 @@ const DocumentTab = () => {
                       <TableCell className="font-medium">{docs.description}</TableCell>
                       <TableCell className="hidden sm:table-cell">{docs.type}</TableCell>
                       <TableCell className="hidden sm:table-cell">
-                        {allUserData &&
-                          allUserData[0].map((item) => {
-                            if (item.id === docs.uid) {
-                              return item.name;
-                            }
-                          })}
+                        {props && props.userData
+                          ? props.userData.map((item, key) => {
+                              if (item.id === docs.uid) {
+                                return (
+                                  <div key={key} className="flex">
+                                    <Avatar src={item.photo} />
+                                    <div className="flex items-center ml-5">{item.name}</div>
+                                  </div>
+                                );
+                              }
+                            })
+                          : null}
                       </TableCell>
                       <TableCell className="hidden sm:table-cell">{docs.date}</TableCell>
                       <TableCell className="hidden sm:table-cell">
@@ -146,16 +157,6 @@ const DocumentTab = () => {
                           <a href={docs.url}>save_alt</a>
                         </Icon>
                       </TableCell>
-                      {/* <Hidden lgUp>
-                        <TableCell>
-                          <IconButton
-                            onClick={(ev) => props.pageLayout.current.toggleRightSidebar()}
-                            aria-label="open right sidebar"
-                          >
-                            <Icon>info</Icon>
-                          </IconButton>
-                        </TableCell>
-                      </Hidden> */}
                     </TableRow>
                   );
                 }

@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
 import FusePageSimple from '@fuse/core/FusePageSimple';
 import { useParams } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import { Divider, Tab, Tabs, Typography } from '@material-ui/core';
 import { motion } from 'framer-motion';
 import CoreService from 'app/services/coreService';
-import { selectGroups } from '../store/groupsSlice';
+import firebaseService from 'app/services/firebaseService';
 import ScheduleTab from './tabs/scheduleTab';
 import DocumentTab from './tabs/documentTab';
 import GeofenceTab from './tabs/geofenceTab';
@@ -37,22 +36,37 @@ function GroupProfilePage() {
   const routeParams = useParams();
   const classes = useStyles();
   const [selectedTab, setSelectedTab] = useState(0);
-  const userData = useSelector(selectGroups);
+  const [userData, setUserData] = useState();
+  // const userData = useSelector(selectGroups);
   // const [groupList, setGroupList] = useState('');
   const [selectedGroupName, setSelectedGroupName] = useState('');
   useEffect(() => {
+    fetchUserData();
+  }, []);
+  const fetchUserData = async () => {
+    await firebaseService.getUserAllData().then(
+      (users) => {
+        setUserData(users);
+        return users;
+      },
+      (error) => {
+        return error;
+      }
+    );
+  };
+  useEffect(() => {
     if (userData) {
-      const group = CoreService.getGroupList(userData[0]);
+      const group = CoreService.getGroupList(userData);
       const id = routeParams;
       if (id) {
         setSelectedGroupName(group[id.index]);
       }
     }
-  }, []);
+  }, [userData]);
 
   useEffect(() => {
     if (userData) {
-      const group = CoreService.getGroupList(userData[0]);
+      const group = CoreService.getGroupList(userData);
       const id = routeParams;
       if (id) {
         setSelectedGroupName(group[id.index]);
@@ -136,13 +150,13 @@ function GroupProfilePage() {
       content={
         <div className="p-16 sm:p-24">
           {selectedTab === 0 && (
-            <AboutTab groupName={selectedGroupName} userData={userData ? userData[0] : ''} />
+            <AboutTab groupName={selectedGroupName} userData={userData || ''} />
           )}
           {selectedTab === 1 && <ScheduleTab groupName={selectedGroupName} />}
-          {selectedTab === 2 && <DocumentTab />}
+          {selectedTab === 2 && <DocumentTab userData={userData || ''} />}
           {selectedTab === 3 && <GeofenceTab groupName={selectedGroupName} />}
           {selectedTab === 4 && (
-            <PaymentTab groupName={selectedGroupName} userData={userData ? userData[0] : ''} />
+            <PaymentTab groupName={selectedGroupName} userData={userData || ''} />
           )}
         </div>
       }

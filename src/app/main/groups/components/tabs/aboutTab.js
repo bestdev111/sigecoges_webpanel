@@ -14,8 +14,9 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 import { motion } from 'framer-motion';
 import clsx from 'clsx';
-import { useDispatch, useSelector } from 'react-redux';
-import { getUserRole, selectRole } from '../../store/roleSlice';
+import { useDispatch } from 'react-redux';
+import firebaseService from 'app/services/firebaseService';
+// import { getUserRole, selectRole } from '../../store/roleSlice';
 
 const useStyles = makeStyles((theme) => ({
   avatar: {
@@ -46,25 +47,27 @@ function AboutTab(props) {
   const [viewUser, setViewUser] = useState(null);
   const [staff, setStaff] = useState([]);
   const [staffNum, setStaffNum] = useState(0);
-  const userRole = useSelector(selectRole);
+  const [userRole, setUserRole] = useState(0);
+  // const userRole = useSelector(selectRole);
 
   useEffect(() => {
-    dispatch(getUserRole(viewUser));
+    if(viewUser){
+      fetchUserRole(viewUser);
+    }
+    // dispatch(getUserRole(viewUser));
   }, [dispatch, viewUser]);
-  
-  // useEffect(() => {
-  //   if(staff && searchStaff.length > 0){
-  //     let temp = [];
-  //     staff.forEach(element => {
-  //       if(element.name.toLowerCase().includes(searchStaff.toLowerCase()) || element.phone.includes(searchStaff)){
-  //         temp.push(element);
-  //         console.log('temp1=>', temp);
-  //       }
-  //     });
-  //     setStaffNum(temp.length);
-  //     setStaff(temp);
-  //   }
-  // }, [dispatch, searchStaff]);
+    
+  const fetchUserRole = async (id) => {
+    await firebaseService.getUserRole(id).then(
+      (user) => {
+        setUserRole(user);
+        return user;
+      },
+      (error) => {
+        return error;
+      }
+    );
+  }
 
   useEffect(() => {
     if(props.userData && props.groupName) {
@@ -78,7 +81,6 @@ function AboutTab(props) {
           } else {
             temp.push(element);
           }
-          console.log('temp2=>', temp);
         }
       });
       setStaff(temp);
@@ -86,7 +88,6 @@ function AboutTab(props) {
     }
   }, [props.userData, props.groupName, searchStaff]);
   
-  console.log('searchStaff=>', staff);
   return (
     <motion.div variants={container} initial="hidden" animate="show">
       <div className="md:flex max-w-2xl">
@@ -247,7 +248,7 @@ function AboutTab(props) {
               </div>
               <div className="mb-24">
                 <Typography className="font-semibold mb-4 text-15">Role</Typography>
-                <Typography>{userRole && userRole[0] ? userRole[0].name : null}</Typography>
+                <Typography>{userRole ? userRole.name : null}</Typography>
               </div>
             </CardContent>
           </Card>

@@ -1,5 +1,6 @@
+/* eslint-disable prefer-const */
 import { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { motion } from 'framer-motion';
 import { DatePicker } from '@material-ui/pickers';
@@ -20,9 +21,9 @@ import {
   Typography,
   Avatar,
 } from '@material-ui/core';
+import firebaseService from 'app/services/firebaseService';
 import CoreService from 'app/services/coreService';
-import { selectPayments, getPayments } from '../../store/salarySlice';
-import { selectGroups, getGroups } from '../../store/groupsSlice';
+// import { selectPayments, getPayments } from '../../store/salarySlice';
 
 const columns = [
   { id: 'id', label: 'ID', minWidth: 20, align: 'center' },
@@ -53,34 +54,45 @@ const useStyles = makeStyles({
 const PaymentTab = (props) => {
   const dispatch = useDispatch();
   const [selectedDate, handleDateChange] = useState(new Date());
-  const payments = useSelector(selectPayments);
-  const users = useSelector(selectGroups);
+  // const payments = useSelector(selectPayments);
   const classes = useStyles();
   const [page, setPage] = useState(0);
   const [rows, setRows] = useState([]);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   useEffect(() => {
-    dispatch(getPayments());
-    dispatch(getGroups());
+    // dispatch(getPayments());
+    fetchUsersPayments();
   }, []);
   useEffect(() => {
-    if (payments && payments[0] !== undefined) {
-      const selectedYear = new Date(selectedDate).getFullYear();
-      const selectedMonth = new Date(selectedDate).getMonth();
-      const temp = [];
-      payments[0].forEach((element) => {
-        if (
-          element.group_name === props.groupName &&
-          element.year === selectedYear &&
-          element.created.month === selectedMonth
-        ) {
-          temp.push(element);
+    fetchUsersPayments();
+  }, [props.groupName, selectedDate]);
+
+  const fetchUsersPayments = async () => {
+    await firebaseService.getAllSalary().then(
+      (salary) => {
+        if (salary) {
+          const selectedYear = new Date(selectedDate).getFullYear();
+          const selectedMonth = new Date(selectedDate).getMonth();
+          let temp = [];
+          salary.forEach((element) => {
+            if (
+              element.group_name === props.groupName &&
+              element.year === selectedYear &&
+              element.created.month === selectedMonth
+            ) {
+              temp.push(element);
+            }
+          });
+          setRows(temp);
         }
-      });
-      setRows(temp);
-    }
-  }, [payments, props.groupName, selectedDate]);
+        return salary;
+      },
+      (error) => {
+        return error;
+      }
+    );
+  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -181,27 +193,24 @@ const PaymentTab = (props) => {
                                   scope="row"
                                 >
                                   <Grid className="flex justify-center">
-                                    {users && users[0] !== undefined
-                                      ? users[0].map((user, key) => {
+                                    {props && props.userData
+                                      ? props.userData.map((user, key) => {
                                           if (
                                             user.id === row.uid &&
                                             user.group_name === props.groupName
                                           ) {
-                                            return <Avatar key={key} src={user.photo} />;
+                                            return (
+                                              <div key={key}>
+                                                <div className="flex justify-center">
+                                                  <Avatar src={user.photo} />
+                                                </div>
+                                                <Typography>{user.name}</Typography>
+                                              </div>
+                                            );
                                           }
                                         })
-                                      : ''}
+                                      : null}
                                   </Grid>
-                                  {users && users[0] !== undefined
-                                    ? users[0].map((user, key) => {
-                                        if (
-                                          user.id === row.uid &&
-                                          user.group_name === props.groupName
-                                        ) {
-                                          return <Typography key={key}>{user.name}</Typography>;
-                                        }
-                                      })
-                                    : ''}
                                 </TableCell>
                                 <TableCell
                                   align="center"
@@ -223,8 +232,8 @@ const PaymentTab = (props) => {
                                   scope="row"
                                 >
                                   {row.roles && row.roles.length > 0
-                                    ? row.roles.map((item, index) => {
-                                        return <div key={index}>{item.name}</div>;
+                                    ? row.roles.map((role, i) => {
+                                        return <div key={i}>{role.name}</div>;
                                       })
                                     : null}
                                 </TableCell>

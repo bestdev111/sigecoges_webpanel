@@ -48,7 +48,6 @@ const GeofencePage = (props) => {
       setData(tempWidgets);
     }
   }, [widgets]);
-  console.log('widgets==>', widgets);
   return (
     <Grid container>
       <Grid item className={clsx(classes.customSize)}>

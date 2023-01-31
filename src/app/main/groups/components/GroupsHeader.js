@@ -1,11 +1,7 @@
-import { useDispatch, useSelector } from 'react-redux';
-import { Icon, Typography} from '@material-ui/core';
+import { Icon, Typography } from '@material-ui/core';
 import { motion } from 'framer-motion';
 
 function UsersHeader(props) {
-  const dispatch = useDispatch();
-  const searchText = useSelector(({ Groups }) => Groups.groups.searchText);
-
   return (
     <div className="flex flex-1 w-full items-center justify-between">
       <div className="flex items-center">

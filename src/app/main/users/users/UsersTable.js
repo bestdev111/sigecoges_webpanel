@@ -303,7 +303,7 @@ function UsersTable(props) {
       <TablePagination
         className="flex-shrink-0 border-t-1"
         component="div"
-        count={data.length}
+        count={data[0].length}
         rowsPerPage={rowsPerPage}
         page={page}
         backIconButtonProps={{

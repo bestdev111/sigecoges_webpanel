@@ -26,6 +26,19 @@ const EmailLinkAuthPage = () => {
     return () => clearInterval(timer);
   });
   useEffect(() => {
+    FirebaseService.auth.applyActionCode(this.props.actionCode).then(
+      () => {
+        // Email address has been verified.
+        this.setState({ validCode: true, verifiedCode: true });
+      },
+      (error) => {
+        // Code is invalid or expired. Ask the user to verify their email address
+        // again.
+        this.setState({ error: error.message, validCode: false, verifiedCode: true });
+      }
+    );
+  }, []);
+  useEffect(() => {
     if (seconds === 0) {
       setLoading(false);
     }
