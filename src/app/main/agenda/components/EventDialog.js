@@ -5,16 +5,14 @@ import { useForm } from 'react-hook-form';
 import FuseUtils from '@fuse/utils/FuseUtils';
 import { AppBar, Avatar, Dialog, DialogContent, Toolbar, Typography } from '@material-ui/core';
 import { useDispatch, useSelector } from 'react-redux';
-import FuseLoading from '@fuse/core/FuseLoading';
 import * as yup from 'yup';
+import FirebaseService from 'app/services/firebaseService';
 import {
-  removeEvent,
   updateEvent,
   addEvent,
   closeNewEventDialog,
   closeEditEventDialog,
 } from '../store/agendaSlice';
-import { selectUsers, getUsers } from '../store/usersSlice';
 
 const defaultValues = {
   id: FuseUtils.generateGUID(),
@@ -25,18 +23,14 @@ const defaultValues = {
   extendedProps: { desc: '' },
 };
 
-/**
- * Form Validation Schema
- */
 const schema = yup.object().shape({
   title: yup.string().required('You must enter a title'),
 });
 
 function EventDialog(props) {
   const dispatch = useDispatch();
-  const [loading, setLoading] = useState(true);
+  const [allUsers, setAllUsers] = useState([]);
   const eventDialog = useSelector(({ Agenda }) => Agenda.events.eventDialog);
-  const users = useSelector(selectUsers);
 
   const { reset, formState, watch, control, getValues, handleSubmit } = useForm({
     defaultValues,
@@ -44,58 +38,31 @@ function EventDialog(props) {
     resolver: yupResolver(schema),
   });
   useEffect(() => {
-    dispatch(getUsers()).then(() => setLoading(false));
+    FirebaseService.getUserAllData().then((result) => {
+      if (result) {
+        setAllUsers(result);
+      }
+    });
   }, []);
-  const { isValid, dirtyFields, errors } = formState;
 
-  const start = watch('start');
-  const end = watch('end');
-  const id = watch('id');
-
-  /**
-   * Initialize Dialog with Data
-   */
   const initDialog = useCallback(() => {
-    /**
-     * Dialog type: 'edit'
-     */
     if (eventDialog.type === 'edit' && eventDialog.data) {
       reset({ ...eventDialog.data });
     }
-
-    /**
-     * Dialog type: 'new'
-     */
-    if (eventDialog.type === 'new') {
-      reset({
-        ...defaultValues,
-        ...eventDialog.data,
-        id: FuseUtils.generateGUID(),
-      });
-    }
   }, [eventDialog.data, eventDialog.type, reset]);
 
-  /**
-   * On Dialog Open
-   */
   useEffect(() => {
     if (eventDialog.props.open) {
       initDialog();
     }
   }, [eventDialog.props.open, initDialog]);
 
-  /**
-   * Close Dialog
-   */
   function closeComposeDialog() {
     return eventDialog.type === 'edit'
       ? dispatch(closeEditEventDialog())
       : dispatch(closeNewEventDialog());
   }
 
-  /**
-   * Form Submit
-   */
   function onSubmit(data) {
     if (eventDialog.type === 'new') {
       dispatch(addEvent(data));
@@ -103,17 +70,6 @@ function EventDialog(props) {
       dispatch(updateEvent({ ...eventDialog.data, ...data }));
     }
     closeComposeDialog();
-  }
-
-  /**
-   * Remove Event
-   */
-  function handleRemove() {
-    dispatch(removeEvent(id));
-    closeComposeDialog();
-  }
-  if (loading) {
-    return <FuseLoading />;
   }
   return (
     <Dialog
@@ -146,11 +102,11 @@ function EventDialog(props) {
               {'Who : '}
             </Typography>
             <div id="Users" className="mt-8 mb-16">
-              {eventDialog && eventDialog.data && users && users[0] !== undefined
-                ? users[0].map((user, index) => {
+              {eventDialog && eventDialog.data && allUsers && allUsers.length > 0
+                ? allUsers.map((user, index) => {
                     if (eventDialog.data.extendedProps.uid === user.id) {
                       return (
-                        <div key={index} className="flex">
+                        <div className="flex">
                           <Avatar className="ml-5" src={user.photo} />
                           <p className="flex items-center ml-5">{user.name}</p>
                         </div>

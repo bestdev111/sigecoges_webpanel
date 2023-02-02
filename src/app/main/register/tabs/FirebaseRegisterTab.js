@@ -59,14 +59,20 @@ function FirebaseRegisterTab(props) {
   useEffect(() => {
     if (
       window.localStorage.getItem('mail-confirm') &&
-      window.localStorage.getItem('mailchimp') === 'auth'
+      window.localStorage.getItem('mailchimp') === 'auth' &&
+      window.localStorage.getItem('hash')
     ) {
       setVerifiedEmail(window.localStorage.getItem('mail-confirm'));
+
       const {
         phone = '',
         email = '',
         password = '',
-      } = { phone: '', email: window.localStorage.getItem('mail-confirm'), password: '12345678' };
+      } = {
+        phone: '',
+        email: window.localStorage.getItem('mail-confirm'),
+        password: window.localStorage.getItem('hash'),
+      };
       defaultValues = { phone, password, email };
       _.mapValues(defaultValues, (value, key) => setValue(key, value));
       // reset({ name: 'email', value: window.localStorage.getItem('mail-confirm') });
@@ -90,7 +96,9 @@ function FirebaseRegisterTab(props) {
   return (
     <div className="w-full">
       <form className="flex flex-col justify-center w-full" onSubmit={handleSubmit(onSubmit)}>
-        <Typography className="mb-10">First of all, You need to verify Email address</Typography>
+        {verifiedEmail.length > 0 ? null : (
+          <Typography className="mb-10">First of all, You need to verify Email address</Typography>
+        )}
         <Controller
           name="email"
           control={control}

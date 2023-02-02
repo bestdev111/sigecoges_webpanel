@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-undef */
 /* eslint-disable react/jsx-no-bind */
@@ -75,10 +76,9 @@ const StyledBadge2 = withStyles((theme) => ({
   },
 }))(Badge);
 function UsersTable(props) {
-  const subscribe = FirebaseService.subscribe();
   const dispatch = useDispatch();
   const users = useSelector(selectAllUsers);
-  const searchText = '';
+  const user = useSelector(({ auth }) => auth.user);
 
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState([]);
@@ -95,17 +95,27 @@ function UsersTable(props) {
   }, []);
 
   useEffect(() => {
-    if (searchText.length !== 0) {
-      setData(
-        _.filter(users[0], (item) =>
-          item.name.toString().toLowerCase().includes(searchText.toString().toLowerCase())
-        )
-      );
-      setPage(0);
-    } else {
-      setData(users);
+    if (users && users[0] && users[0].length > 0 && user) {
+      if (user.role === 'SUPER_ADMIN') {
+        let temp = [];
+        users[0].forEach((element) => {
+          temp.push(element);
+        });
+        setData(temp);
+      }
+      if (user.role === 'ADMIN') {
+        FirebaseService.getUserWithEmail(user.email).then((currentUser) => {
+          let temp = [];
+          users[0].forEach((element) => {
+            if (currentUser.group_name === element.group_name) {
+              temp.push(element);
+            }
+          });
+          setData(temp);
+        });
+      }
     }
-  }, [users, searchText]);
+  }, [users, user]);
 
   function handleRequestSort(event, property) {
     const id = property;
@@ -123,7 +133,7 @@ function UsersTable(props) {
 
   function handleSelectAllClick(event) {
     if (event.target.checked) {
-      setSelected(data[0].forEach((n) => n.uid));
+      setSelected(data.forEach((n) => n.uid));
       return;
     }
     setSelected([]);
@@ -148,8 +158,8 @@ function UsersTable(props) {
   if (loading) {
     return <FuseLoading />;
   }
-
-  if (data[0].length === 0) {
+  console.log('data => ', data);
+  if (!data || data.length === 0) {
     return (
       <motion.div
         initial={{ opacity: 0 }}
@@ -164,157 +174,191 @@ function UsersTable(props) {
   }
   return (
     <div className="w-full flex flex-col">
-      <FuseScrollbars className="flex-grow overflow-x-auto">
-        <Table stickyHeader className="min-w-xl" aria-labelledby="tableTitle">
-          <UsersTableHead
-            selectedProductIds={selected}
-            order={order}
-            onSelectAllClick={handleSelectAllClick}
-            onRequestSort={handleRequestSort}
-            rowCount={data[0].length}
-            onMenuItemClick={handleDeselect}
+      {data && data.length > 0 ? (
+        <>
+          <FuseScrollbars className="flex-grow overflow-x-auto">
+            <Table stickyHeader className="min-w-xl" aria-labelledby="tableTitle">
+              <UsersTableHead
+                selectedProductIds={selected}
+                order={order}
+                onSelectAllClick={handleSelectAllClick}
+                onRequestSort={handleRequestSort}
+                rowCount={data.length}
+                onMenuItemClick={handleDeselect}
+              />
+
+              <TableBody>
+                {_.orderBy(
+                  data,
+                  [
+                    (o) => {
+                      switch (order.uid) {
+                        case 'categories': {
+                          return o.categories[0];
+                        }
+                        default: {
+                          return o[order.uid];
+                        }
+                      }
+                    },
+                  ],
+                  [order.direction]
+                )
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((n, index) => {
+                    const isSelected = selected.indexOf(index) !== -1;
+                    return (
+                      <TableRow
+                        className="h-72 cursor-pointer"
+                        hover
+                        role="checkbox"
+                        aria-checked={isSelected}
+                        tabIndex={-1}
+                        key={index}
+                        selected={isSelected}
+                        onClick={(event) => handleClick(n.id)}
+                      >
+                        <TableCell
+                          align="center"
+                          className="p-4 md:p-16"
+                          component="th"
+                          scope="row"
+                        >
+                          {index + 1}
+                        </TableCell>
+                        <TableCell
+                          className="w-52 px-4 md:pr-0 md:pl-20"
+                          component="th"
+                          scope="row"
+                          padding="none"
+                          align="left"
+                        >
+                          {n.status === 1 ? (
+                            <StyledBadge1
+                              overlap="circular"
+                              anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'right',
+                              }}
+                              variant="dot"
+                            >
+                              <Avatar
+                                alt={n.name}
+                                src={n.photo ? n.photo : 'assets/images/avatars/profile.jpg'}
+                              />
+                            </StyledBadge1>
+                          ) : n.status === 0 ? (
+                            <StyledBadge0
+                              overlap="circular"
+                              anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'right',
+                              }}
+                              variant="dot"
+                            >
+                              <Avatar
+                                alt={n.name}
+                                src={n.photo ? n.photo : 'assets/images/avatars/profile.jpg'}
+                              />
+                            </StyledBadge0>
+                          ) : (
+                            <StyledBadge2
+                              overlap="circular"
+                              anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'right',
+                              }}
+                              variant="dot"
+                            >
+                              <Avatar
+                                alt={n.name}
+                                src={n.photo ? n.photo : 'assets/images/avatars/profile.jpg'}
+                              />
+                            </StyledBadge2>
+                          )}
+                        </TableCell>
+
+                        <TableCell
+                          align="center"
+                          className="p-4 md:p-16"
+                          component="th"
+                          scope="row"
+                        >
+                          {n.name}
+                        </TableCell>
+
+                        <TableCell
+                          align="center"
+                          className="p-4 md:p-16 truncate"
+                          component="th"
+                          scope="row"
+                        >
+                          {n.phone}
+                        </TableCell>
+
+                        <TableCell
+                          align="center"
+                          className="p-4 md:p-16"
+                          component="th"
+                          scope="row"
+                        >
+                          {n.info}
+                        </TableCell>
+                        <TableCell
+                          align="center"
+                          className="p-4 md:p-16"
+                          component="th"
+                          scope="row"
+                        >
+                          {n.rate}
+                        </TableCell>
+                        <TableCell
+                          align="center"
+                          className="p-4 md:p-16"
+                          component="th"
+                          scope="row"
+                        >
+                          {n.type}
+                        </TableCell>
+                        <TableCell
+                          align="center"
+                          className="p-4 md:p-16"
+                          component="th"
+                          scope="row"
+                        >
+                          {n.group_name}
+                        </TableCell>
+                        {/* <TableCell align='center' className="p-4 md:p-16" component="th" scope="row">
+                          {n.state ? (
+                            <Icon className="text-green text-20">check_circle</Icon>
+                          ) : (
+                            <Icon className="text-red text-20">remove_circle</Icon>
+                          )}
+                        </TableCell> */}
+                      </TableRow>
+                    );
+                  })}
+              </TableBody>
+            </Table>
+          </FuseScrollbars>
+
+          <TablePagination
+            className="flex-shrink-0 border-t-1"
+            component="div"
+            count={data.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            backIconButtonProps={{
+              'aria-label': 'Previous Page',
+            }}
+            nextIconButtonProps={{
+              'aria-label': 'Next Page',
+            }}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
           />
-
-          <TableBody>
-            {_.orderBy(
-              data[0],
-              [
-                (o) => {
-                  switch (order.uid) {
-                    case 'categories': {
-                      return o.categories[0];
-                    }
-                    default: {
-                      return o[order.uid];
-                    }
-                  }
-                },
-              ],
-              [order.direction]
-            )
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((n, index) => {
-                const isSelected = selected.indexOf(index) !== -1;
-                return (
-                  <TableRow
-                    className="h-72 cursor-pointer"
-                    hover
-                    role="checkbox"
-                    aria-checked={isSelected}
-                    tabIndex={-1}
-                    key={index}
-                    selected={isSelected}
-                    onClick={(event) => handleClick(n.id)}
-                  >
-                    <TableCell align="center" className="p-4 md:p-16" component="th" scope="row">
-                      {index + 1}
-                    </TableCell>
-                    <TableCell
-                      className="w-52 px-4 md:pr-0 md:pl-20"
-                      component="th"
-                      scope="row"
-                      padding="none"
-                      align="left"
-                    >
-                      {n.status === 1 ? (
-                        <StyledBadge1
-                          overlap="circular"
-                          anchorOrigin={{
-                            vertical: 'bottom',
-                            horizontal: 'right',
-                          }}
-                          variant="dot"
-                        >
-                          <Avatar
-                            alt={n.name}
-                            src={n.photo ? n.photo : 'assets/images/avatars/profile.jpg'}
-                          />
-                        </StyledBadge1>
-                      ) : n.status === 0 ? (
-                        <StyledBadge0
-                          overlap="circular"
-                          anchorOrigin={{
-                            vertical: 'bottom',
-                            horizontal: 'right',
-                          }}
-                          variant="dot"
-                        >
-                          <Avatar
-                            alt={n.name}
-                            src={n.photo ? n.photo : 'assets/images/avatars/profile.jpg'}
-                          />
-                        </StyledBadge0>
-                      ) : (
-                        <StyledBadge2
-                          overlap="circular"
-                          anchorOrigin={{
-                            vertical: 'bottom',
-                            horizontal: 'right',
-                          }}
-                          variant="dot"
-                        >
-                          <Avatar
-                            alt={n.name}
-                            src={n.photo ? n.photo : 'assets/images/avatars/profile.jpg'}
-                          />
-                        </StyledBadge2>
-                      )}
-                    </TableCell>
-
-                    <TableCell align="center" className="p-4 md:p-16" component="th" scope="row">
-                      {n.name}
-                    </TableCell>
-
-                    <TableCell
-                      align="center"
-                      className="p-4 md:p-16 truncate"
-                      component="th"
-                      scope="row"
-                    >
-                      {n.phone}
-                    </TableCell>
-
-                    <TableCell align="center" className="p-4 md:p-16" component="th" scope="row">
-                      {n.info}
-                    </TableCell>
-                    <TableCell align="center" className="p-4 md:p-16" component="th" scope="row">
-                      {n.rate}
-                    </TableCell>
-                    <TableCell align="center" className="p-4 md:p-16" component="th" scope="row">
-                      {n.type}
-                    </TableCell>
-                    <TableCell align="center" className="p-4 md:p-16" component="th" scope="row">
-                      {n.group_name}
-                    </TableCell>
-                    {/* <TableCell align='center' className="p-4 md:p-16" component="th" scope="row">
-                      {n.state ? (
-                        <Icon className="text-green text-20">check_circle</Icon>
-                      ) : (
-                        <Icon className="text-red text-20">remove_circle</Icon>
-                      )}
-                    </TableCell> */}
-                  </TableRow>
-                );
-              })}
-          </TableBody>
-        </Table>
-      </FuseScrollbars>
-
-      <TablePagination
-        className="flex-shrink-0 border-t-1"
-        component="div"
-        count={data[0].length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        backIconButtonProps={{
-          'aria-label': 'Previous Page',
-        }}
-        nextIconButtonProps={{
-          'aria-label': 'Next Page',
-        }}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
+        </>
+      ) : null}
     </div>
   );
 }

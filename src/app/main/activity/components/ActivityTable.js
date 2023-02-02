@@ -17,6 +17,7 @@ import {
 import _ from '@lodash';
 import { motion } from 'framer-motion';
 import CoreService from 'app/services/coreService';
+import FirebaseService from 'app/services/firebaseService';
 import { getUserGeofence, selectGeofence } from '../store/geofenceSlice';
 import { getAllActivity, selectAllActivity } from '../store/activitySlice';
 import { getUserAllData, selectAllUsers } from '../store/userSlice';
@@ -27,7 +28,7 @@ function ActivityTable(props) {
   const activities = useSelector(selectAllActivity);
   const geofence = useSelector(selectGeofence);
   const users = useSelector(selectAllUsers);
-  const searchText = '';
+  const user = useSelector(({ auth }) => auth.user);
 
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState([]);
@@ -46,10 +47,27 @@ function ActivityTable(props) {
   }, []);
 
   useEffect(() => {
-    if (activities) {
-      setData(activities[0]);
+    if (activities && activities[0] !== undefined && user && users && users[0] !== undefined) {
+      if (user.role === 'SUPER_ADMIN') {
+        setData(activities[0]);
+      }
+      if (user.role === 'ADMIN') {
+        FirebaseService.getUserWithEmail(user.email).then((currentUser) => {
+          const temp = [];
+          activities[0].forEach((element) => {
+            users[0].forEach((item) => {
+              if (item.id === element.uid) {
+                if (currentUser.group_name === item.group_name) {
+                  temp.push(element);
+                }
+              }
+            });
+          });
+          setData(temp);
+        });
+      }
     }
-  }, [activities]);
+  }, [activities, users]);
 
   function handleRequestSort(event, property) {
     const id = property;
@@ -102,7 +120,6 @@ function ActivityTable(props) {
       </motion.div>
     );
   }
-  console.log('=====>>>', data);
   return (
     <div className="w-full flex flex-col">
       <FuseScrollbars className="flex-grow overflow-x-auto">
@@ -161,14 +178,14 @@ function ActivityTable(props) {
                     </TableCell>
                     <TableCell align="center" className="p-4 md:p-16" component="th" scope="row">
                       {users && users[0] !== undefined
-                        ? users[0].map((user, i) => {
-                            if (user.id === n.uid) {
+                        ? users[0].map((item, i) => {
+                            if (item.id === n.uid) {
                               return (
                                 <div key={i}>
                                   <div className="flex justify-center">
-                                    <Avatar src={user.photo} />
+                                    <Avatar src={item.photo} />
                                   </div>
-                                  <div className="flex justify-center">{user.name}</div>
+                                  <div className="flex justify-center">{item.name}</div>
                                 </div>
                               );
                             }

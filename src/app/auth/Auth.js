@@ -32,22 +32,23 @@ class Auth extends Component {
       firebaseService.onAuthStateChanged((authUser) => {
         if (authUser) {
           this.props.showMessage({ message: 'Logging ...' });
-          console.log('here', authUser.uid);
           /**
            * Retrieve user data from Firebase
            */
-          firebaseService.getUserData(authUser.uid).then(
-            (user) => {
-              this.props.setUserDataFirebase(user, authUser);
-
+          firebaseService.db
+            .ref('tbl_user')
+            .orderByChild('email')
+            .equalTo(authUser.email)
+            .on('value', async (snapshot) => {
+              if (snapshot.val()) {
+                const keys = Object.keys(snapshot.val());
+                const userData = snapshot.val()[keys[0]];
+                this.props.setUserDataFirebase(userData, authUser);
+                resolve();
+                this.props.showMessage({ message: 'Welcome' });
+              }
               resolve();
-
-              this.props.showMessage({ message: 'Welcome' });
-            },
-            (error) => {
-              resolve();
-            }
-          );
+            });
         } else {
           resolve();
         }

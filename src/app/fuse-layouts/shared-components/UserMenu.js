@@ -6,12 +6,13 @@ import ListItemText from '@material-ui/core/ListItemText';
 import MenuItem from '@material-ui/core/MenuItem';
 import Popover from '@material-ui/core/Popover';
 import Typography from '@material-ui/core/Typography';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
 import { logoutUser } from 'app/auth/store/userSlice';
+import FirebaseService from 'app/services/firebaseService';
 
 function UserMenu(props) {
+  const [name, setName] = useState(null);
   const dispatch = useDispatch();
   const user = useSelector(({ auth }) => auth.user);
 
@@ -24,18 +25,31 @@ function UserMenu(props) {
   const userMenuClose = () => {
     setUserMenu(null);
   };
-
+  useEffect(() => {
+    if (user) {
+      if (user.role === 'ADMIN') {
+        FirebaseService.getUserWithEmail(user.email).then((data) => {
+          setName(data.name);
+        });
+      }
+      if (user.role === 'SUPER_ADMIN') {
+        FirebaseService.db.ref('tbl_admin').on('value', async (snapshot) => {
+          if (snapshot) setName(snapshot.val().name);
+        });
+      }
+    }
+  }, [user]);
   return (
     <>
       <Button className="min-h-40 min-w-40 px-0 md:px-16 py-0 md:py-6" onClick={userMenuClick}>
         <div className="hidden md:flex flex-col mx-4 items-end">
           <Typography component="span" className="font-semibold flex">
-            {user.email}
+            {name !== null ? name : ''}
           </Typography>
         </div>
 
-        {user.data.photo ? (
-          <Avatar className="md:mx-4" alt="user photo" src={user.data.photo} />
+        {user && user.photoURL ? (
+          <Avatar className="md:mx-4" alt="user photo" src={user.photoURL} />
         ) : (
           <Avatar className="md:mx-4" src="assets/images/avatars/profile.jpg" />
         )}
@@ -57,42 +71,17 @@ function UserMenu(props) {
           paper: 'py-8',
         }}
       >
-        {!user.type || user.type.length === 0 ? (
-          <>
-            <MenuItem component={Link} to="/login" role="button">
-              <ListItemIcon className="min-w-40">
-                <Icon>lock</Icon>
-              </ListItemIcon>
-              <ListItemText primary="Login" />
-            </MenuItem>
-            <MenuItem component={Link} to="/register" role="button">
-              <ListItemIcon className="min-w-40">
-                <Icon>person_add</Icon>
-              </ListItemIcon>
-              <ListItemText primary="Register" />
-            </MenuItem>
-          </>
-        ) : (
-          <>
-            {/* <MenuItem component={Link} to="/profile" onClick={userMenuClose} role="button">
-              <ListItemIcon className="min-w-40">
-                <Icon>account_circle</Icon>
-              </ListItemIcon>
-              <ListItemText primary="My Profile" />
-            </MenuItem> */}
-            <MenuItem
-              onClick={() => {
-                dispatch(logoutUser());
-                userMenuClose();
-              }}
-            >
-              <ListItemIcon className="min-w-40">
-                <Icon>exit_to_app</Icon>
-              </ListItemIcon>
-              <ListItemText primary="Logout" />
-            </MenuItem>
-          </>
-        )}
+        <MenuItem
+          onClick={() => {
+            dispatch(logoutUser());
+            userMenuClose();
+          }}
+        >
+          <ListItemIcon className="min-w-40">
+            <Icon>exit_to_app</Icon>
+          </ListItemIcon>
+          <ListItemText primary="Logout" />
+        </MenuItem>
       </Popover>
     </>
   );

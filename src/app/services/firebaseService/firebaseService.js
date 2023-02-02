@@ -1,3 +1,6 @@
+/* eslint-disable consistent-return */
+/* eslint-disable no-undef */
+/* eslint-disable no-unused-expressions */
 /* eslint-disable prefer-const */
 /* eslint-disable no-plusplus */
 /* eslint import/no-extraneous-dependencies: off */
@@ -70,23 +73,52 @@ class FirebaseService {
     if (!firebase.apps.length) {
       return false;
     }
-    return new Promise((resolve, reject) => {
-      this.db.ref(`tbl_user`).on('value', async (snapshot) => {
-        let temp = [];
-        if (snapshot.numChildren !== 0) {
-          temp = snapshot.val()[id];
-          if (temp) temp.id = id;
-        }
-        resolve(temp);
+    if (id) {
+      return new Promise((resolve, reject) => {
+        this.db.ref(`tbl_user`).on('value', async (snapshot) => {
+          let temp = [];
+          if (snapshot.numChildren !== 0) {
+            temp = snapshot.val()[id];
+            if (temp) temp.id = id;
+          }
+          resolve(temp);
+        });
       });
-    });
+    }
+    resolve([]);
+  };
+
+  getUserWithEmail = (email) => {
+    if (!firebase.apps.length) {
+      return false;
+    }
+    if (email) {
+      return new Promise((resolve, reject) => {
+        this.db
+          .ref(`tbl_user`)
+          .orderByChild('email')
+          .equalTo(email)
+          .on('value', async (snapshot) => {
+            if (snapshot.val()) {
+              const keys = Object.keys(snapshot.val());
+              const userData = snapshot.val()[keys[0]];
+              resolve(userData);
+            }
+          });
+      });
+    }
+    resolve();
   };
 
   updateUserData = (user) => {
     if (!firebase.apps.length) {
       return false;
     }
-    return this.db.ref(`users/${user.uid}`).set(user);
+    console.log('updateUserData===>', user);
+    if (user && user.uid) {
+      return this.db.ref(`tbl_user/${user.uid}`).push(user);
+    }
+    return this.db.ref(`users`).push(user);
   };
 
   onAuthStateChanged = (callback) => {
@@ -295,8 +327,8 @@ class FirebaseService {
           const ids = Object.keys(snapshot.val());
           let index = 0;
           snapshot.forEach((snap) => {
-            const obj = snap.val();
-            obj.id = ids[index];
+            let obj = snap.val();
+            // obj.id = ids[index];
             temp.push(obj);
             index++;
           });
@@ -349,6 +381,37 @@ class FirebaseService {
           resolve(temp);
         }
       });
+    });
+  };
+
+  registerStaff = (model) => {
+    if (!firebase.apps.length && model) {
+      return false;
+    }
+    return new Promise((resolve, reject) => {
+      this.db
+        .ref(`tbl_phone_number`)
+        .orderByChild('phone')
+        .equalTo(model.phone)
+        .on('value', async (snapshot) => {
+          if (snapshot.val()) {
+            const key = Object.keys(snapshot.val());
+            if (key.length > 0) {
+              console.log('return', key);
+              resolve;
+            }
+          } else {
+            const newPostKey = this.db.ref().child('tbl_phone_number').push().key;
+            this.db
+              .ref(`tbl_phone_number/${newPostKey}`)
+              .set({ phone: model.phone, group_name: model.group_name })
+              .then((result) => {
+                console.log('success', result);
+                resolve;
+              })
+              .catch((err) => resolve);
+          }
+        });
     });
   };
 }

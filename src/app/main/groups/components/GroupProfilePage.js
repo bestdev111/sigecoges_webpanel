@@ -54,15 +54,6 @@ function GroupProfilePage() {
       }
     );
   };
-  useEffect(() => {
-    if (userData) {
-      const group = CoreService.getGroupList(userData);
-      const id = routeParams;
-      if (id) {
-        setSelectedGroupName(group[id.index]);
-      }
-    }
-  }, [userData]);
 
   useEffect(() => {
     if (userData) {

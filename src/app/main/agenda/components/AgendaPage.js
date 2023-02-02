@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 import { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
@@ -9,15 +10,12 @@ import interactionPlugin from '@fullcalendar/interaction';
 import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import withReducer from 'app/store/withReducer';
+import FirebaseService from 'app/services/firebaseService';
 import AgendaHeader from './AgendaHeader';
 import EventDialog from './EventDialog';
 import reducer from '../store';
-import {
-  getEvents,
-  selectEvents,
-  openNewEventDialog,
-  openEditEventDialog,
-} from '../store/agendaSlice';
+import { getEvents, selectEvents, openEditEventDialog } from '../store/agendaSlice';
+import { selectUsers, getUsers } from '../store/usersSlice';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -86,27 +84,37 @@ function renderEventContent(eventInfo) {
 
 const AgendaPage = (props) => {
   const [currentDate, setCurrentDate] = useState();
+  const [agendaData, setAgendaData] = useState();
   const dispatch = useDispatch();
-  const events = useSelector(selectEvents);
   const calendarRef = useRef();
-
   const classes = useStyles(props);
-  const headerEl = useRef(null);
+  const events = useSelector(selectEvents);
+  const allUsers = useSelector(selectUsers);
+  const user = useSelector(({ auth }) => auth.user);
 
   useEffect(() => {
     dispatch(getEvents());
+    dispatch(getUsers());
   }, []);
 
-  const handleDateSelect = (selectInfo) => {
-    const { start, end } = selectInfo;
-
-    dispatch(
-      openNewEventDialog({
-        start,
-        end,
-      })
-    );
-  };
+  useEffect(() => {
+    if (allUsers && user && events) {
+      if (user.role === 'ADMIN') {
+        FirebaseService.getUserWithEmail(user.email).then((e) => {
+          let temp = [];
+          events.forEach((element) => {
+            if (allUsers[0][element.uid].group_name === e.group_name) {
+              temp.push(element);
+            }
+          });
+          setAgendaData(temp);
+        });
+      }
+      if (user.role === 'SUPER_ADMIN') {
+        setAgendaData(events);
+      }
+    }
+  }, [allUsers, user, events]);
 
   const handleEventClick = (clickInfo) => {
     const { id, title, allDay, start, end, extendedProps } = clickInfo.event;
@@ -125,7 +133,6 @@ const AgendaPage = (props) => {
   const handleDates = (rangeInfo) => {
     setCurrentDate(rangeInfo);
   };
-
   return (
     <div className={clsx(classes.root, 'flex flex-col flex-auto relative')}>
       <AgendaHeader calendarRef={calendarRef} currentDate={currentDate} />
@@ -136,23 +143,25 @@ const AgendaPage = (props) => {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1, transition: { delay: 0.2 } }}
         >
-          <FullCalendar
-            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-            headerToolbar={false}
-            initialView="dayGridMonth"
-            editable
-            selectable
-            selectMirror
-            dayMaxEvents
-            weekends
-            firstDay={1}
-            datesSet={handleDates}
-            events={events}
-            eventContent={renderEventContent}
-            eventClick={handleEventClick}
-            initialDate={new Date()}
-            ref={calendarRef}
-          />
+          {agendaData ? (
+            <FullCalendar
+              plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+              headerToolbar={false}
+              initialView="dayGridMonth"
+              editable
+              selectable
+              selectMirror
+              dayMaxEvents
+              weekends
+              firstDay={1}
+              datesSet={handleDates}
+              events={agendaData}
+              eventContent={renderEventContent}
+              eventClick={handleEventClick}
+              initialDate={new Date()}
+              ref={calendarRef}
+            />
+          ) : null}
         </motion.div>
         <EventDialog />
       </div>

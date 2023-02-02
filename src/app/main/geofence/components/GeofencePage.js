@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 /* eslint-disable no-restricted-syntax */
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,6 +9,7 @@ import Map from 'app/fuse-layouts/shared-components/Map';
 import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import FuseLoading from '@fuse/core/FuseLoading';
+import FirebaseService from 'app/services/firebaseService';
 import reducer from '../store';
 import { selectWidgetsEntities, getWidgets } from '../store/widgetsSlice';
 
@@ -32,22 +34,37 @@ const GeofencePage = (props) => {
   const dispatch = useDispatch();
   const widgets = useSelector(selectWidgetsEntities);
   const [data, setData] = useState([]);
+  const user = useSelector(({ auth }) => auth.user);
 
   useEffect(() => {
     dispatch(getWidgets());
   }, []);
   useEffect(() => {
-    const tempWidgets = [];
-    if (widgets) {
-      for (const key in widgets) {
-        if (Object.hasOwnProperty.call(widgets, key)) {
-          const element = widgets[key];
-          tempWidgets.push(element);
+    if (widgets && user) {
+      let tempWidgets = [];
+      if (user.role === 'SUPER_ADMIN') {
+        for (const key in widgets) {
+          if (Object.hasOwnProperty.call(widgets, key)) {
+            const element = widgets[key];
+            tempWidgets.push(element);
+          }
         }
+      }
+      if (user.role === 'ADMIN') {
+        FirebaseService.getUserWithEmail(user.email).then((e) => {
+          for (const key in widgets) {
+            if (Object.hasOwnProperty.call(widgets, key)) {
+              const element = widgets[key];
+              if (e.group_name === element.group_name) {
+                tempWidgets.push(element);
+              }
+            }
+          }
+        });
       }
       setData(tempWidgets);
     }
-  }, [widgets]);
+  }, [widgets, user]);
   return (
     <Grid container>
       <Grid item className={clsx(classes.customSize)}>

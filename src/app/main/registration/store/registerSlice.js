@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { showMessage } from 'app/store/fuse/messageSlice';
 import firebaseService from 'app/services/firebaseService';
-import { createUserSettingsFirebase } from 'app/auth/store/userSlice';
+// import { createUserSettingsFirebase } from 'app/auth/store/userSlice';
 
 export const registerWithFirebase = (model) => async (dispatch) => {
   if (!firebaseService.auth) {
@@ -14,13 +14,13 @@ export const registerWithFirebase = (model) => async (dispatch) => {
   return firebaseService.auth
     .createUserWithEmailAndPassword(email, password)
     .then((response) => {
-      dispatch(
-        createUserSettingsFirebase({
-          ...response.user,
-          displayName,
-          email,
-        })
-      );
+      // dispatch(
+      //   createUserSettingsFirebase({
+      //     ...response.user,
+      //     displayName,
+      //     email,
+      //   })
+      // );
 
       return dispatch(registerSuccess());
     })

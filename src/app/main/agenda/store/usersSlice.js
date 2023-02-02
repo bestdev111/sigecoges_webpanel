@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk, createEntityAdapter } from '@reduxjs/too
 import firebaseService from 'app/services/firebaseService';
 
 export const getUsers = createAsyncThunk('users/getUsers', async () => {
-  const response = await firebaseService.getUserAllData().then(
+  const response = await firebaseService.allUsers().then(
     (users) => {
       return users;
     },

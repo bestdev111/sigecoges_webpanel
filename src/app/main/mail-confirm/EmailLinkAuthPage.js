@@ -1,10 +1,11 @@
+/* eslint-disable no-return-assign */
 import { useEffect, useCallback, useRef, useState } from 'react';
 import FirebaseService from 'app/services/firebaseService';
 import { motion } from 'framer-motion';
 import clsx from 'clsx';
 import { Card, CardContent, Icon, Typography } from '@material-ui/core';
 
-const EmailLinkAuthPage = () => {
+const EmailLinkAuthPage = (props) => {
   const [loading, setLoading] = useState(false);
   const requestExecutedRef = useRef();
   // const { state, setError } = useRequestState();
@@ -13,6 +14,9 @@ const EmailLinkAuthPage = () => {
   }, [window.location.href]);
 
   const [seconds, setSeconds] = useState(5);
+  const [validCode, setValidCode] = useState(false);
+  const [verifiedCode, setVerifiedCode] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -25,19 +29,24 @@ const EmailLinkAuthPage = () => {
     // clearing interval
     return () => clearInterval(timer);
   });
-  useEffect(() => {
-    FirebaseService.auth.applyActionCode(this.props.actionCode).then(
-      () => {
-        // Email address has been verified.
-        this.setState({ validCode: true, verifiedCode: true });
-      },
-      (error) => {
-        // Code is invalid or expired. Ask the user to verify their email address
-        // again.
-        this.setState({ error: error.message, validCode: false, verifiedCode: true });
-      }
-    );
-  }, []);
+  // useEffect(() => {
+  //   console.log('really?', props.actionCode);
+  //   FirebaseService.auth.applyActionCode(props.actionCode).then(
+  //     (result) => {
+  //       // Email address has been verified.
+  //       console.log('really?', result);
+  //       setValidCode(true);
+  //       setVerifiedCode(true);
+  //     },
+  //     (err) => {
+  //       // Code is invalid or expired. Ask the user to verify their email address
+  //       // again.
+  //       setValidCode(false);
+  //       setVerifiedCode(true);
+  //       setError(err.message);
+  //     }
+  //   );
+  // }, []);
   useEffect(() => {
     if (seconds === 0) {
       setLoading(false);
@@ -84,10 +93,7 @@ const EmailLinkAuthPage = () => {
     try {
       // sign in with link, and retrieve the ID Token
       // await signInWithEmailLink(auth, email, href);
-      // let's clear the email from the storage
-      // localStorage.removeItem('mail-confirm');
       localStorage.setItem('mailchimp', 'auth');
-      // redirect user to the home page
       redirectToRegister();
     } catch (e) {
       return e;

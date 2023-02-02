@@ -10,6 +10,9 @@ export const getEvents = createAsyncThunk('Agenda/getEvents', async () => {
   const response = FirebaseService.getAgenda().then(
     (agenda) => {
       // eslint-disable-next-line prefer-const
+      // FirebaseService.allUsers().then((allUser) => {
+      // });
+      // console.log('heeel', allUser);
       const temp = [];
       if (agenda && agenda[0] !== undefined) {
         agenda.forEach((element, index) => {
@@ -22,6 +25,7 @@ export const getEvents = createAsyncThunk('Agenda/getEvents', async () => {
             allDay: false,
             d: CoreService.getFullDateStringFromTimestamp(element.dateTimestamp),
             uid: element.uid,
+            // group_name: allUser[element.uid],
           };
           temp.push(obj);
         });

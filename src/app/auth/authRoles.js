@@ -1,6 +1,6 @@
 const authRoles = {
-  super_admin: ['super_admin'],
-  admin: ['super_admin', 'admin'],
+  super_admin: ['SUPER_ADMIN'],
+  admin: ['SUPER_ADMIN', 'ADMIN'],
   onlyGuest: [],
 };
 
