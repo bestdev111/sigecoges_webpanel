@@ -15,7 +15,6 @@ import {
   Avatar,
 } from '@material-ui/core';
 import _ from '@lodash';
-import { motion } from 'framer-motion';
 import CoreService from 'app/services/coreService';
 import FirebaseService from 'app/services/firebaseService';
 import { getUserGeofence, selectGeofence } from '../store/geofenceSlice';
@@ -109,15 +108,23 @@ function ActivityTable(props) {
 
   if (data && data.length === 0) {
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1, transition: { delay: 0.1 } }}
-        className="flex flex-1 items-center justify-center h-full"
-      >
-        <Typography color="textSecondary" variant="h5">
-          There are no activity!
-        </Typography>
-      </motion.div>
+      <div className="w-full flex flex-col">
+        <FuseScrollbars className="flex-grow overflow-x-auto">
+          <Table stickyHeader className="min-w-xl" aria-labelledby="tableTitle">
+            <ActivityTableHead
+              selectedProductIds={selected}
+              order={order}
+              onSelectAllClick={handleSelectAllClick}
+              onRequestSort={handleRequestSort}
+              rowCount={0}
+              onMenuItemClick={handleDeselect}
+            />
+          </Table>
+          <Typography className="mt-5" color="textSecondary" variant="h6" align="center">
+            There are no activity!
+          </Typography>
+        </FuseScrollbars>
+      </div>
     );
   }
   return (

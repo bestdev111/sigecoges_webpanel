@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-fragments */
 /* eslint-disable prefer-const */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-undef */
@@ -7,6 +8,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import FuseScrollbars from '@fuse/core/FuseScrollbars';
 import FuseLoading from '@fuse/core/FuseLoading';
+import { Controller, useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Avatar,
   Table,
@@ -16,13 +19,77 @@ import {
   TableRow,
   Typography,
   Badge,
+  Dialog,
+  IconButton,
+  FormControl,
+  InputLabel,
+  Select,
+  FormHelperText,
+  MenuItem,
+  Button,
+  TextField,
 } from '@material-ui/core';
 import _ from '@lodash';
-import { motion } from 'framer-motion';
-import { withStyles } from '@material-ui/core/styles';
+import MuiDialogTitle from '@material-ui/core/DialogTitle';
+import MuiDialogContent from '@material-ui/core/DialogContent';
+import MuiDialogActions from '@material-ui/core/DialogActions';
+import CloseIcon from '@material-ui/icons/Close';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
 import FirebaseService from 'app/services/firebaseService';
+import * as yup from 'yup';
 import { getUserAllData, selectAllUsers } from '../store/usersSlice';
 import UsersTableHead from './UsersTableHead';
+
+const styles = (theme) => ({
+  root: {
+    margin: 0,
+    padding: theme.spacing(2),
+  },
+  closeButton: {
+    position: 'absolute',
+    right: theme.spacing(1),
+    top: theme.spacing(1),
+    color: theme.palette.grey[500],
+  },
+});
+const useStyles = makeStyles({
+  formControl: {
+    minWidth: 120,
+    marginBottom: '40px',
+  },
+  selectEmpty: {
+    marginTop: '20px',
+  },
+});
+const schema = yup.object().shape({
+  phone: yup.number().required('You must enter valid phone number'),
+});
+const DialogTitle = withStyles(styles)((props) => {
+  const { children, classes, onClose, ...other } = props;
+  return (
+    <MuiDialogTitle disableTypography className={classes.root} {...other}>
+      <Typography variant="h6">{children}</Typography>
+      {onClose ? (
+        <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
+          <CloseIcon />
+        </IconButton>
+      ) : null}
+    </MuiDialogTitle>
+  );
+});
+
+const DialogContent = withStyles((theme) => ({
+  root: {
+    padding: theme.spacing(2),
+  },
+}))(MuiDialogContent);
+
+const DialogActions = withStyles((theme) => ({
+  root: {
+    margin: 0,
+    padding: theme.spacing(1),
+  },
+}))(MuiDialogActions);
 
 const StyledBadge0 = withStyles((theme) => ({
   badge: {
@@ -76,10 +143,19 @@ const StyledBadge2 = withStyles((theme) => ({
   },
 }))(Badge);
 function UsersTable(props) {
+  const classes = useStyles(props);
+  const [selectType, setSelectType] = useState('');
+  const [open, setOpen] = useState();
   const dispatch = useDispatch();
   const users = useSelector(selectAllUsers);
   const user = useSelector(({ auth }) => auth.user);
-
+  const { control, formState, handleSubmit, reset, setError } = useForm({
+    mode: 'onChange',
+    defaultValues: { phone: '' },
+    resolver: yupResolver(schema),
+  });
+  const { isValid, dirtyFields, errors } = formState;
+  const [errorText, setErrorText] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState([]);
   const [data, setData] = useState(users);
@@ -93,6 +169,10 @@ function UsersTable(props) {
   useEffect(() => {
     dispatch(getUserAllData()).then(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    setOpen(props.open);
+  }, [props]);
 
   useEffect(() => {
     if (users && users[0] && users[0].length > 0 && user) {
@@ -130,7 +210,9 @@ function UsersTable(props) {
       id,
     });
   }
-
+  const handleChange = (event) => {
+    setSelectType(event.target.value);
+  };
   function handleSelectAllClick(event) {
     if (event.target.checked) {
       setSelected(data.forEach((n) => n.uid));
@@ -154,24 +236,61 @@ function UsersTable(props) {
   function handleChangeRowsPerPage(event) {
     setRowsPerPage(event.target.value);
   }
-
+  function onSubmit(model) {
+    if (selectType.length === 0) {
+      setErrorText(true);
+      return;
+    }
+    model.type = selectType;
+    if (model && model.phone) {
+      console.log('model===>', model);
+      FirebaseService.registerStaff(model).then((result) => {
+        if (result) {
+          if (!result.success) {
+            setError('phone', {
+              type: 'manual',
+              message: result.message,
+            });
+            setSelectType('');
+            setErrorText(false);
+          } else {
+            console.log('success made!!!!');
+            handleClose();
+            reset({ phone: '' });
+            setSelectType('');
+            setErrorText(false);
+          }
+        }
+      });
+    }
+  }
   if (loading) {
     return <FuseLoading />;
   }
-  console.log('data => ', data);
   if (!data || data.length === 0) {
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1, transition: { delay: 0.1 } }}
-        className="flex flex-1 items-center justify-center h-full"
-      >
-        <Typography color="textSecondary" variant="h5">
-          There are no users!
-        </Typography>
-      </motion.div>
+      <div className="w-full flex flex-col">
+        <FuseScrollbars className="flex-grow overflow-x-auto">
+          <Table stickyHeader className="min-w-xl" aria-labelledby="tableTitle">
+            <UsersTableHead
+              selectedProductIds={selected}
+              order={order}
+              onSelectAllClick={handleSelectAllClick}
+              onRequestSort={handleRequestSort}
+              rowCount={0}
+              onMenuItemClick={handleDeselect}
+            />
+          </Table>
+          <Typography className="mt-5" color="textSecondary" variant="h6" align="center">
+            There are no Users!
+          </Typography>
+        </FuseScrollbars>
+      </div>
     );
   }
+  const handleClose = () => {
+    props.closeDialog(false);
+  };
   return (
     <div className="w-full flex flex-col">
       {data && data.length > 0 ? (
@@ -293,7 +412,7 @@ function UsersTable(props) {
                           component="th"
                           scope="row"
                         >
-                          {n.phone}
+                          +{n.phone}
                         </TableCell>
 
                         <TableCell
@@ -359,6 +478,93 @@ function UsersTable(props) {
           />
         </>
       ) : null}
+      <Dialog
+        maxWidth="sm"
+        fullWidth
+        onClose={handleClose}
+        aria-labelledby="customized-dialog-title"
+        open={open}
+      >
+        <DialogTitle id="customized-dialog-title" onClose={handleClose}>
+          User Registration
+        </DialogTitle>
+        <DialogContent dividers className="flex justify-center">
+          <form
+            name="registerForm"
+            noValidate
+            className="flex flex-col justify-center w-192"
+            onSubmit={handleSubmit(onSubmit)}
+          >
+            <FormControl
+              name="type"
+              variant="outlined"
+              className={classes.formControl}
+              control={control}
+            >
+              <InputLabel id="demo-simple-select-outlined-label">Type</InputLabel>
+              <Select
+                labelId="demo-simple-select-outlined-label"
+                id="demo-simple-select-outlined"
+                value={selectType}
+                onChange={handleChange}
+                label="Type"
+                type="type"
+                error={!!errors.type}
+              >
+                <MenuItem value="">
+                  <em>Please select type</em>
+                </MenuItem>
+                {user.role === 'ADMIN' ? (
+                  <MenuItem value="STAFF">Staff</MenuItem>
+                ) : (
+                  ['ADMIN', 'STAFF'].map((item, index) => (
+                    <MenuItem key={index} value={item}>
+                      {item}
+                    </MenuItem>
+                  ))
+                )}
+              </Select>
+              {errorText ? (
+                <FormHelperText className="text-red-700">Please select a type</FormHelperText>
+              ) : null}
+            </FormControl>
+            <Controller
+              name="phone"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  className="mb-16"
+                  label="Phone"
+                  autoFocus
+                  placeholder="+2251234567890"
+                  type="phone"
+                  error={!!errors.phone}
+                  helperText={errors?.phone?.message}
+                  variant="outlined"
+                  required
+                  fullWidth
+                />
+              )}
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              className="w-full mx-auto mt-16"
+              aria-label="Register"
+              disabled={_.isEmpty(dirtyFields) || !isValid}
+              type="submit"
+            >
+              Create an account
+            </Button>
+          </form>
+        </DialogContent>
+        {/* <DialogActions>
+          <Button autoFocus onClick={handleClose} color="primary">
+            Save changes
+          </Button>
+        </DialogActions> */}
+      </Dialog>
     </div>
   );
 }

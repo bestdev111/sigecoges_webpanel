@@ -4,6 +4,7 @@ import LoginConfig from 'app/main/login/LoginConfig';
 import RegisterConfig from 'app/main/register/RegisterConfig';
 import LogoutConfig from 'app/main/logout/LogoutConfig';
 import ExampleConfig from 'app/main/example/ExampleConfig';
+import DashboardPageConfig from 'app/main/dashboard/DashboardPageConfig';
 import usersDataConfigs from 'app/main/users/usersDataConfigs';
 import GroupsConfig from 'app/main/groups/GroupsConfig';
 import ActivityConfig from 'app/main/activity/ActivityConfig';
@@ -22,6 +23,7 @@ const routeConfigs = [
   MailConfirmPageConfig,
 
   ...usersDataConfigs,
+  DashboardPageConfig,
   GroupsConfig,
   ActivityConfig,
   AgendaConfig,
@@ -35,11 +37,11 @@ const routes = [
   // if you want to make whole app auth protected by default change defaultAuth for example:
   // ...FuseUtils.generateRoutesFromConfigs(routeConfigs, ['admin','staff','user']),
   // The individual route configs which has auth option won't be overridden.
-  ...FuseUtils.generateRoutesFromConfigs(routeConfigs, ['super_admin', 'admin']),
+  ...FuseUtils.generateRoutesFromConfigs(routeConfigs, ['SUPER_ADMIN', 'ADMIN']),
   {
     exact: true,
     path: '/',
-    component: () => <Redirect to="/users" />,
+    component: () => <Redirect to="/dashboard" />,
   },
   {
     path: '/loading',

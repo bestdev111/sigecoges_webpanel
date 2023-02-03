@@ -10,6 +10,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import FuseLoading from '@fuse/core/FuseLoading';
 import FirebaseService from 'app/services/firebaseService';
+import _ from '@lodash';
 import reducer from '../store';
 import { selectWidgetsEntities, getWidgets } from '../store/widgetsSlice';
 
@@ -43,33 +44,28 @@ const GeofencePage = (props) => {
     if (widgets && user) {
       let tempWidgets = [];
       if (user.role === 'SUPER_ADMIN') {
-        for (const key in widgets) {
-          if (Object.hasOwnProperty.call(widgets, key)) {
-            const element = widgets[key];
-            tempWidgets.push(element);
-          }
-        }
+        _.values(widgets).forEach((widget) => {
+          tempWidgets.push(widget);
+        });
+        setData(tempWidgets);
       }
       if (user.role === 'ADMIN') {
         FirebaseService.getUserWithEmail(user.email).then((e) => {
-          for (const key in widgets) {
-            if (Object.hasOwnProperty.call(widgets, key)) {
-              const element = widgets[key];
-              if (e.group_name === element.group_name) {
-                tempWidgets.push(element);
-              }
+          _.values(widgets).forEach((widget) => {
+            if (e.group_name === widget.group_name) {
+              tempWidgets.push(widget);
             }
-          }
+          });
+          setData(tempWidgets);
         });
       }
-      setData(tempWidgets);
     }
   }, [widgets, user]);
   return (
     <Grid container>
       <Grid item className={clsx(classes.customSize)}>
         <motion.div variants={item} className="widget w-full p-16 pb-32">
-          {data && data.length !== 0 ? (
+          {data ? (
             <Map
               zoom={12}
               markers={data}

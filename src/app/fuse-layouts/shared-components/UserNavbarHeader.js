@@ -29,6 +29,14 @@ const useStyles = makeStyles((theme) => ({
       borderRadius: '50%',
     },
   },
+  collapse: {
+    textAlign: 'center',
+    textOverflow: 'ellipsis',
+    overflow: 'hidden',
+    whiteSpace: 'normal',
+    display: 'block',
+    width: '150px',
+  },
 }));
 
 function UserNavbarHeader(props) {
@@ -56,7 +64,10 @@ function UserNavbarHeader(props) {
       classes={{ root: classes.root }}
       className="user relative flex flex-col items-center justify-center pt-24 pb-64 mb-32 z-0 shadow-0"
     >
-      <Typography className="username text-18 whitespace-nowrap font-semibold mb-4" color="inherit">
+      <Typography
+        className={clsx(classes.collapse, 'username text-18 whitespace-nowrap font-semibold mb-4')}
+        color="inherit"
+      >
         {name !== null ? name : ''}
       </Typography>
       {/* <Typography

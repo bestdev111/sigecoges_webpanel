@@ -1,11 +1,11 @@
+/* eslint-disable no-else-return */
 import Divider from '@material-ui/core/Divider';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import { memo } from 'react';
 import _ from '@lodash';
-import FuseNavHorizontalLayout1 from './horizontal/FuseNavHorizontalLayout1';
+import { useSelector } from 'react-redux';
 import FuseNavVerticalLayout1 from './vertical/FuseNavVerticalLayout1';
-import FuseNavVerticalLayout2 from './vertical/FuseNavVerticalLayout2';
 import FuseNavHorizontalCollapse from './horizontal/types/FuseNavHorizontalCollapse';
 import FuseNavHorizontalGroup from './horizontal/types/FuseNavHorizontalGroup';
 import FuseNavHorizontalItem from './horizontal/types/FuseNavHorizontalItem';
@@ -65,24 +65,47 @@ function FuseNavigation(props) {
     'firstLevel',
     'selectedId',
   ]);
-  if (props.navigation.length > 0) {
-    switch (props.layout) {
-      case 'horizontal': {
-        return <FuseNavHorizontalLayout1 {...options} />;
+  const user = useSelector(({ auth }) => auth.user);
+
+  function removeObjects1(content) {
+    return content.reduce((arr, obj) => {
+      if (obj.id && obj.id === 'mygroup') {
+        return arr;
+      } else if (obj.children && obj.children.length) {
+        arr.push({ ...obj, children: removeObjects1(obj.children) });
+        return arr;
+      } else {
+        arr.push(obj);
+        return arr;
       }
-      case 'vertical': {
-        return <FuseNavVerticalLayout1 {...options} />;
-      }
-      case 'vertical-2': {
-        return <FuseNavVerticalLayout2 {...options} />;
-      }
-      default: {
-        return <FuseNavVerticalLayout1 {...options} />;
-      }
-    }
-  } else {
-    return null;
+    }, []);
   }
+  function removeObjects2(content) {
+    return content.reduce((arr, obj) => {
+      if (obj.id && obj.id === 'groups') {
+        return arr;
+      } else if (obj.children && obj.children.length) {
+        arr.push({ ...obj, children: removeObjects2(obj.children) });
+        return arr;
+      } else {
+        arr.push(obj);
+        return arr;
+      }
+    }, []);
+  }
+  if (user.role && props.navigation.length > 0) {
+    if (user.role === 'SUPER_ADMIN') {
+      const result = removeObjects1(options.navigation);
+      options.navigation = result;
+      return <FuseNavVerticalLayout1 {...options} />;
+    }
+    if (user.role === 'ADMIN') {
+      const result = removeObjects2(options.navigation);
+      options.navigation = result;
+      return <FuseNavVerticalLayout1 {...options} />;
+    }
+  }
+  return null;
 }
 
 FuseNavigation.propTypes = {

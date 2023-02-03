@@ -1,7 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { showMessage } from 'app/store/fuse/messageSlice';
 import firebaseService from 'app/services/firebaseService';
-// import { createUserSettingsFirebase } from 'app/auth/store/userSlice';
 
 export const registerWithFirebase = (model) => async (dispatch) => {
   if (!firebaseService.auth) {
@@ -9,40 +8,19 @@ export const registerWithFirebase = (model) => async (dispatch) => {
 
     return () => false;
   }
-  const { email, password, displayName } = model;
+  const { email, password } = model;
 
   return firebaseService.auth
     .createUserWithEmailAndPassword(email, password)
-    .then((response) => {
-      // dispatch(
-      //   createUserSettingsFirebase({
-      //     ...response.user,
-      //     displayName,
-      //     email,
-      //   })
-      // );
-
+    .then(() => {
       return dispatch(registerSuccess());
     })
     .catch((error) => {
-      const usernameErrorCodes = [
-        'auth/operation-not-allowed',
-        'auth/user-not-found',
-        'auth/user-disabled',
-      ];
-
       const emailErrorCodes = ['auth/email-already-in-use', 'auth/invalid-email'];
 
       const passwordErrorCodes = ['auth/weak-password', 'auth/wrong-password'];
 
       const response = [];
-
-      if (usernameErrorCodes.includes(error.code)) {
-        response.push({
-          type: 'username',
-          message: error.message,
-        });
-      }
 
       if (emailErrorCodes.includes(error.code)) {
         response.push({

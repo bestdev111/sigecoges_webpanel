@@ -1,4 +1,5 @@
 import { createSelector, createEntityAdapter, createSlice } from '@reduxjs/toolkit';
+// import navigationConfig1 from 'app/fuse-configs/navigationConfig1';
 import navigationConfig from 'app/fuse-configs/navigationConfig';
 import FuseUtils from '@fuse/utils';
 import i18next from 'i18next';

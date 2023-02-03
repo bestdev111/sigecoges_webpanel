@@ -188,8 +188,16 @@ function AboutTab(props) {
                           />
                         );
                       }
+                      return (
+                        <Typography className="mt-5" color="textSecondary" variant="h6" align="center">
+                          There are no Users!
+                        </Typography>
+                      )
                     })
-                  : <>No Staff</>}
+                  : <Typography className="mt-5" color="textSecondary" variant="h6" align="center">
+                          There are no Users!
+                        </Typography>
+                }
               </Grid>
             </CardContent>
           </Card>

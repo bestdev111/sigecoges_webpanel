@@ -14,8 +14,16 @@ const navigationConfig = [
     title: 'Menu',
     translate: 'Menu',
     type: 'group',
-    icon: 'dashboard',
     children: [
+      {
+        id: 'dashboard',
+        title: 'Dashboard',
+        translate: 'Dashboard',
+        type: 'item',
+        auth: authRoles.admin,
+        url: '/dashboard',
+        icon: 'dashboard',
+      },
       {
         id: 'users',
         title: 'Users',
@@ -32,6 +40,15 @@ const navigationConfig = [
         type: 'item',
         auth: authRoles.admin,
         url: '/groups',
+        icon: 'group',
+      },
+      {
+        id: 'mygroup',
+        title: 'My Group',
+        translate: 'My Group',
+        type: 'item',
+        auth: authRoles.admin,
+        url: '/mygroup',
         icon: 'group',
       },
       {
@@ -73,23 +90,23 @@ const navigationConfig = [
       },
     ],
   },
-  {
-    id: 'user',
-    title: '',
-    translate: '',
-    type: 'group',
-    children: [
-      {
-        id: 'staff_registration',
-        title: 'Staff Registration',
-        translate: 'Staff Registration',
-        type: 'item',
-        auth: authRoles.admin,
-        url: '/registration',
-        icon: 'person_add',
-      },
-    ],
-  },
+  // {
+  //   id: 'user',
+  //   title: '',
+  //   translate: '',
+  //   type: 'group',
+  //   children: [
+  //     {
+  //       id: 'staff_registration',
+  //       title: 'Staff Registration',
+  //       translate: 'Staff Registration',
+  //       type: 'item',
+  //       auth: authRoles.admin,
+  //       url: '/registration',
+  //       icon: 'person_add',
+  //     },
+  //   ],
+  // },
 ];
 
 export default navigationConfig;

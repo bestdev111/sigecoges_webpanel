@@ -93,11 +93,6 @@ export const registerWithFirebase = (model) => async (dispatch) => {
                 .then((e) => {
                   localStorage.removeItem('mail-confirm');
                   localStorage.removeItem('mailchimp');
-                  // const newPostKey = firebaseService.db.ref().child('tbl_phone_number').push().key;
-                  // console.log('key===>', newPostKey);
-                  // firebaseService.db
-                  //   .ref(`tbl_phone_number/${newPostKey}`)
-                  //   .set({ phone, group_name });
                   const data = { phone, group_name };
                   firebaseService.registerStaff(data);
                   firebaseService.getUserWithEmail(e.user.email).then((user) => {

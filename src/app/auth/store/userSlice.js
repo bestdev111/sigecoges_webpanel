@@ -1,8 +1,5 @@
-/* eslint-disable no-new */
-/* eslint-disable no-restricted-syntax */
-/* eslint import/no-extraneous-dependencies: off */
+/* eslint-disable consistent-return */
 import { createSlice } from '@reduxjs/toolkit';
-import firebase from 'firebase/app';
 import 'firebase/auth';
 import history from '@history';
 import _ from '@lodash';
@@ -10,99 +7,17 @@ import { setInitialSettings } from 'app/store/fuse/settingsSlice';
 import { showMessage } from 'app/store/fuse/messageSlice';
 import firebaseService from 'app/services/firebaseService';
 
-export const setUserDataFirebase = (user, authUser) => async (dispatch) => {
+export const setUserDataFirebase = (user) => async (dispatch) => {
   if (user) {
-    // Set user data but do not update
     return setUser(user);
   }
 };
 
-export const createUserSettingsFirebase = (authUser) => async (dispatch, getState) => {
-  console.log('createUserSettingsFirebase11=>', authUser);
-  const guestUser = getState().auth.user;
-  const userKey = '';
-  const userData = {};
-  const data = new Promise((resolve, reject) => {
-    firebaseService.db.ref('tbl_user').on('value', async (snapshot) => {
-      if (snapshot.val() !== null && authUser.email) {
-        console.log('QQQQ===>', authUser);
-        if (authUser.phone && authUser.userId) {
-          const key = authUser.userId[0];
-          const element = snapshot.val()[key];
-          console.log('registerUSER???===>', key, element);
-          resolve({ userKey: key, userData: element });
-        } else {
-          for (const key in snapshot.val()) {
-            if (Object.hasOwnProperty.call(snapshot.val(), key)) {
-              const element = snapshot.val()[key];
-              if (element.email === authUser.email) {
-                console.log('LoginUSER???===>', key, element);
-                resolve({ userKey: key, userData: element });
-              }
-            }
-          }
-        }
-      }
-    });
-    resolve(null);
-  });
-  data.then((result) => {
-    console.log('USERSLICE==>', result);
-    if (result !== null) {
-      const fuseDefaultSettings = getState().fuse.settings.defaults;
-      const { currentUser } = firebase.auth();
-      /**
-       * Merge with current Settings
-       */
-      let user = null;
-      if (result.userKey && result.userData && result.userData !== undefined) {
-        console.log(`It's MEMBER`);
-        user = _.merge({}, guestUser, {
-          uid: result.userKey,
-          email: result.userData.email,
-          password: result.userData.password,
-          data: {
-            settings: { ...fuseDefaultSettings },
-          },
-        });
-      } else {
-        console.log(`It's Not MEMBER`);
-        user = _.merge({}, guestUser, {
-          uid: result.userKey,
-          type: 'ADMIN',
-          role: ['admin'],
-          email: result.userData.email,
-          // password: userData.password,
-          data: {
-            // email: authUser.email,
-            settings: { ...fuseDefaultSettings },
-          },
-        });
-      }
-      console.log('USERSLICE User==>', user);
-      currentUser.updateProfile(user.data);
-
-      // dispatch(updateUserData(user));
-
-      return dispatch(setUserData(user));
-    }
-  });
-};
-
 export const setUserData = (user) => async (dispatch, getState) => {
   /*
-        You can redirect the logged-in user to a specific route depending on his role
-         */
-  // user.redirectUrl = '/';
-  console.log('Please redirect!!!!');
-  // window.location.href = '/';
+    You can redirect the logged-in user to a specific route depending on his role
+      */
   history.location.state = '/user';
-
-  /*
-    Set User Settings
-     */
-  // dispatch(setDefaultSettings(user.data.settings));
-
   dispatch(setUser(user));
 };
 
@@ -123,9 +38,7 @@ export const updateUserShortcuts = (shortcuts) => async (dispatch, getState) => 
       ...user.data,
     },
   };
-
   dispatch(updateUserData(user));
-
   return dispatch(setUserData(newUser));
 };
 

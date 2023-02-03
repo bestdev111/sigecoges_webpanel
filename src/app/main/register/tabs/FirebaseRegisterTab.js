@@ -4,17 +4,15 @@ import Icon from '@material-ui/core/Icon';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import TextField from '@material-ui/core/TextField';
 import IconButton from '@material-ui/core/IconButton';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerWithFirebase, doVerifyEmail } from 'app/auth/store/registerSlice';
 import * as yup from 'yup';
 import _ from '@lodash';
 import { Typography } from '@material-ui/core';
+import FuseLoading from '@fuse/core/FuseLoading';
 
-/**
- * Form Validation Schema
- */
 const schema = yup.object().shape({
   phone: yup.number().required('You must enter a valid phone number'),
   email: yup.string().email('You must enter a valid email').required('You must enter a email'),
@@ -22,23 +20,19 @@ const schema = yup.object().shape({
     .string()
     .required('Please enter your password.')
     .min(8, 'Password is too short - should be 8 chars minimum.'),
-  // passwordConfirm: yup.string().oneOf([yup.ref('password'), null], 'Passwords must match'),
 });
 
 let defaultValues = {
   phone: '',
   email: '',
   password: '',
-  // passwordConfirm: '',
 };
 
 function FirebaseRegisterTab(props) {
   const dispatch = useDispatch();
   const authRegister = useSelector(({ auth }) => auth.register);
-
+  const [loading, setLoading] = useState(true);
   const [verifiedEmail, setVerifiedEmail] = useState('');
-  const [isFormValid, setIsFormValid] = useState(false);
-  const formRef = useRef(null);
   const { control, formState, handleSubmit, reset, setError, setValue } = useForm({
     mode: 'onChange',
     defaultValues,
@@ -48,6 +42,7 @@ function FirebaseRegisterTab(props) {
   const { isValid, dirtyFields, errors } = formState;
   const [showPassword, setShowPassword] = useState(false);
   useEffect(() => {
+    setLoading(true);
     authRegister.errors.forEach((error) => {
       setError(error.type, {
         type: 'manual',
@@ -75,15 +70,11 @@ function FirebaseRegisterTab(props) {
       };
       defaultValues = { phone, password, email };
       _.mapValues(defaultValues, (value, key) => setValue(key, value));
-      // reset({ name: 'email', value: window.localStorage.getItem('mail-confirm') });
-      // setValue('name', window.localStorage.getItem('mail-confirm'), {
-      //   shouldValidate: true,
-      // });
     }
   }, [window.localStorage.getItem('mail-confirm'), window.localStorage.getItem('mailchimp')]);
 
   function onSubmit(model) {
-    dispatch(registerWithFirebase(model));
+    dispatch(registerWithFirebase(model)).then(() => setLoading(false));
   }
   function verifyEmailFunc() {
     dispatch(
@@ -91,7 +82,10 @@ function FirebaseRegisterTab(props) {
         control.fieldsRef.current.email._f.value,
         control.fieldsRef.current.password._f.value
       )
-    );
+    ).then(() => setLoading(false));
+  }
+  if (!loading) {
+    return <FuseLoading />;
   }
   return (
     <div className="w-full">

@@ -23,7 +23,7 @@ import FuseLoading from '@fuse/core/FuseLoading';
 import { useSelector } from 'react-redux';
 
 const schema = yup.object().shape({
-  phone: yup.number().required('You must enter staff phone number'),
+  phone: yup.number().required('You must enter valid phone number'),
 });
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -47,7 +47,7 @@ const container = {
 function RegistrationPageContent(props) {
   const classes = useStyles(props);
   const user = useSelector(({ auth }) => auth.user);
-  const { control, formState, handleSubmit, reset } = useForm({
+  const { control, formState, handleSubmit, reset, setError } = useForm({
     mode: 'onChange',
     defaultValues: { phone: '' },
     resolver: yupResolver(schema),
@@ -56,7 +56,7 @@ function RegistrationPageContent(props) {
   const [selectGroup, setSelectGroup] = useState('');
   const [userData, setUserData] = useState('');
   const [groupList, setGroupList] = useState([]);
-  const [error, setError] = useState(false);
+  const [errorText, setErrorText] = useState(false);
   const [loading, setLoading] = useState(true);
   const [myGroup, setMyGroup] = useState();
 
@@ -70,7 +70,7 @@ function RegistrationPageContent(props) {
   }, []);
 
   useEffect(() => {
-    setError(false);
+    setErrorText(false);
   }, [selectGroup]);
 
   const fetchUserData = async () => {
@@ -80,8 +80,8 @@ function RegistrationPageContent(props) {
         setGroupList(group);
         return users;
       },
-      (error) => {
-        return error;
+      (err) => {
+        return err;
       }
     );
   };
@@ -91,15 +91,22 @@ function RegistrationPageContent(props) {
   };
   function onSubmit(model) {
     if (selectGroup.length === 0) {
-      setError(true);
+      setErrorText(true);
       return;
     }
     model.group_name = selectGroup;
     FirebaseService.registerStaff(model).then((result) => {
       if (result) {
-        reset({ phone: '' });
+        if (result !== 'success') {
+          setError('phone', {
+            type: 'manual',
+            message: 'This phone number is already used',
+          });
+        } else {
+          reset({ phone: '' });
+        }
         setSelectGroup('');
-        setError(false);
+        setErrorText(false);
       }
     });
   }
@@ -113,7 +120,7 @@ function RegistrationPageContent(props) {
           <form
             name="registerForm"
             noValidate
-            className="flex flex-col justify-center w-full"
+            className="flex flex-col justify-center w-192"
             onSubmit={handleSubmit(onSubmit)}
           >
             <FormControl
@@ -153,7 +160,7 @@ function RegistrationPageContent(props) {
                   </>
                 )}
               </Select>
-              {error ? (
+              {errorText ? (
                 <FormHelperText className="text-red-700">Please select a group</FormHelperText>
               ) : null}
             </FormControl>

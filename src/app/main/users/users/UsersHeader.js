@@ -1,8 +1,10 @@
-import {Icon, Typography} from '@material-ui/core';
+import { Icon, Typography, Button } from '@material-ui/core';
 import { motion } from 'framer-motion';
 
-function UsersHeader() {
-
+function UsersHeader(props) {
+  const handleClickOpen = () => {
+    props.openDialog(true);
+  };
   return (
     <div className="flex flex-1 w-full items-center justify-between">
       <div className="flex items-center">
@@ -24,6 +26,20 @@ function UsersHeader() {
           Users
         </Typography>
       </div>
+      <motion.div
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0, transition: { delay: 0.2 } }}
+      >
+        <Button
+          className="whitespace-nowrap"
+          variant="contained"
+          color="secondary"
+          onClick={handleClickOpen}
+        >
+          <span className="hidden sm:flex">Add New User</span>
+          <span className="flex sm:hidden">New User</span>
+        </Button>
+      </motion.div>
     </div>
   );
 }

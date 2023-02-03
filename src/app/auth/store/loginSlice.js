@@ -81,7 +81,6 @@ export const submitLoginWithFireBase =
                   .then((e) => {
                     firebaseService.getUserWithEmail(e.user.email).then((user) => {
                       dispatch(showMessage({ message: 'successfully logged' }));
-                      console.log('LOGIN=>', user);
                       const userData = {
                         email: user.email,
                         role: user.type,

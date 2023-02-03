@@ -385,33 +385,37 @@ class FirebaseService {
   };
 
   registerStaff = (model) => {
-    if (!firebase.apps.length && model) {
+    if (!firebase.apps.length) {
       return false;
     }
     return new Promise((resolve, reject) => {
-      this.db
-        .ref(`tbl_phone_number`)
-        .orderByChild('phone')
-        .equalTo(model.phone)
-        .on('value', async (snapshot) => {
-          if (snapshot.val()) {
-            const key = Object.keys(snapshot.val());
-            if (key.length > 0) {
-              console.log('return', key);
-              resolve;
+      if (model) {
+        this.db
+          .ref(`tbl_phone_number`)
+          .orderByChild('phone')
+          .equalTo(model.phone)
+          .on('value', async (snapshot) => {
+            let temp = null;
+            if (snapshot.exists()) {
+              console.log(snapshot.val());
+              resolve({ success: false, message: 'The phone number is already used.' });
+            } else {
+              console.log('No data available');
+              const newPostKey = this.db.ref().child('tbl_phone_number').push().key;
+
+              this.db
+                .ref(`tbl_phone_number/${newPostKey}`)
+                .set({ phone: model.phone, type: model.type })
+                .then(() => {
+                  console.log('Successfully resolve');
+                  resolve({ success: true, message: 'Successfully created.' });
+                })
+                .catch((err) =>
+                  resolve({ success: false, message: 'Sorry. Something went wrong' })
+                );
             }
-          } else {
-            const newPostKey = this.db.ref().child('tbl_phone_number').push().key;
-            this.db
-              .ref(`tbl_phone_number/${newPostKey}`)
-              .set({ phone: model.phone, group_name: model.group_name })
-              .then((result) => {
-                console.log('success', result);
-                resolve;
-              })
-              .catch((err) => resolve);
-          }
-        });
+          });
+      }
     });
   };
 }

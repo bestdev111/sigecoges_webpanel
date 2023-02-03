@@ -112,7 +112,7 @@ const EmailLinkAuthPage = (props) => {
               </div>
 
               <Typography variant="h5" className="text-center mb-16 font-semibold">
-                Configuration!
+                Congratulation!
               </Typography>
 
               <Typography className="text-center mb-16 w-full" color="textSecondary">

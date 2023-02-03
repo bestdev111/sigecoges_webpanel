@@ -57,64 +57,68 @@ const Map = (props) => {
     }
     setToolTip(index);
   };
-  return (
-    <GoogleMap
-      defaultZoom={props.zoom}
-      defaultCenter={{ lat: props.markers[0].lat, lng: props.markers[0].lng }}
-    >
-      {props.markers.map((place, index) => {
-        return (
-          <Fragment key={index}>
-            <Marker
-              position={{
-                lat: parseFloat(place.lat),
-                lng: parseFloat(place.lng),
-              }}
-              onClick={() => toolTipFunc(index)}
-            >
-              {isOpen && toolTip === index ? (
-                <InfoWindow
-                  className="p-4"
-                  defaultPosition={new google.maps.LatLng(place.lat, place.lng)}
-                  options={{ closeBoxURL: ``, enableEventPropagation: true }}
-                  onClick={() => toolTipFunc(index)}
-                >
-                  {/* <Icon>person</Icon> */}
-                  <div>
-                    <p className={clsx(classes.tooltip, 'text-16 font-bold')}>
-                      {'Name : '}
-                      {place.name}
-                    </p>
-                    <p className={classes.tooltip}>
-                      {'Group : '}
-                      {place.group_name}
-                    </p>
-                    <p className={clsx(classes.ellipsis, classes.tooltip)}>
-                      {'Address : '}
-                      {place.address}
-                    </p>
-                  </div>
-                </InfoWindow>
-              ) : null}
-            </Marker>
-            <Circle
-              defaultCenter={{
-                lat: parseFloat(place.lat),
-                lng: parseFloat(place.lng),
-              }}
-              radius={200}
-              options={{
-                fillColor: '#ff0000',
-                strokeColor: '#ff0000',
-                fillOpacity: 0.3,
-                strokeOpacity: 0.2,
-              }}
-            />
-          </Fragment>
-        );
-      })}
-    </GoogleMap>
-  );
+  console.log('MARKERS=> ', props.markers);
+  if (props.markers && props.markers.length > 0) {
+    return (
+      <GoogleMap
+        defaultZoom={props.zoom}
+        defaultCenter={{ lat: props.markers[0].lat, lng: props.markers[0].lng }}
+      >
+        {props.markers.map((place, index) => {
+          return (
+            <Fragment key={index}>
+              <Marker
+                position={{
+                  lat: parseFloat(place.lat),
+                  lng: parseFloat(place.lng),
+                }}
+                onClick={() => toolTipFunc(index)}
+              >
+                {isOpen && toolTip === index ? (
+                  <InfoWindow
+                    className="p-4"
+                    defaultPosition={new google.maps.LatLng(place.lat, place.lng)}
+                    options={{ closeBoxURL: ``, enableEventPropagation: true }}
+                    onClick={() => toolTipFunc(index)}
+                  >
+                    {/* <Icon>person</Icon> */}
+                    <div>
+                      <p className={clsx(classes.tooltip, 'text-16 font-bold')}>
+                        {'Name : '}
+                        {place.name}
+                      </p>
+                      <p className={classes.tooltip}>
+                        {'Group : '}
+                        {place.group_name}
+                      </p>
+                      <p className={clsx(classes.ellipsis, classes.tooltip)}>
+                        {'Address : '}
+                        {place.address}
+                      </p>
+                    </div>
+                  </InfoWindow>
+                ) : null}
+              </Marker>
+              <Circle
+                defaultCenter={{
+                  lat: parseFloat(place.lat),
+                  lng: parseFloat(place.lng),
+                }}
+                radius={200}
+                options={{
+                  fillColor: '#ff0000',
+                  strokeColor: '#ff0000',
+                  fillOpacity: 0.3,
+                  strokeOpacity: 0.2,
+                }}
+              />
+            </Fragment>
+          );
+        })}
+      </GoogleMap>
+    );
+  }
+  return <GoogleMap defaultZoom={props.zoom} defaultCenter={{ lat: 5.338537, lng: -3.947649 }} />;
 };
 
 export default withScriptjs(withGoogleMap(Map));

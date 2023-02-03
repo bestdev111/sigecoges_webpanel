@@ -1,5 +1,6 @@
 import { lazy } from 'react';
 import { authRoles } from 'app/auth';
+
 const GroupsConfig = {
   settings: {
     layout: {},
@@ -13,6 +14,10 @@ const GroupsConfig = {
     {
       path: '/groupprofile/:index',
       component: lazy(() => import('./components/GroupProfilePage')),
+    },
+    {
+      path: '/mygroup',
+      component: lazy(() => import('./components/MyGroupPage')),
     },
   ],
 };
