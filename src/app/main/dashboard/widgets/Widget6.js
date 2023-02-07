@@ -41,6 +41,11 @@ function Widget6(props) {
       ],
     },
     yaxis: {
+      labels: {
+        formatter(val) {
+          return val.toFixed(0);
+        },
+      },
       // title: {
       //   text: 'XOF',
       //   rotate: 0,
