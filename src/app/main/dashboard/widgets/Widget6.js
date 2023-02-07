@@ -80,40 +80,49 @@ function Widget6(props) {
     if (selectedDate) {
       setAwaitRender(false);
       const year = selectedDate.getFullYear();
-      FirebaseService.getAllSalary().then((salary) => {
-        if (salary) {
-          const temp = [];
-          const yearData = _.filter(salary, (o) => {
-            return o.year === year;
-          });
-          for (let index = 0; index < 12; index++) {
-            const eachMonthData = _.filter(yearData, (o) => {
-              return new Date(o.created.time).getMonth() === index;
+      FirebaseService.getAllSalary()
+        .then((salary) => {
+          if (salary) {
+            const temp = [];
+            const yearData = _.filter(salary, (o) => {
+              return o.year === year;
             });
-            let totalMonthPayment = 0;
-            if (eachMonthData.length > 0) {
-              eachMonthData.forEach((element) => {
-                totalMonthPayment =
-                  totalMonthPayment + Number(element.fixed) + Number(element.hourly);
+            for (let index = 0; index < 12; index++) {
+              const eachMonthData = _.filter(yearData, (o) => {
+                return new Date(o.created.time).getMonth() === index;
               });
+              let totalMonthPayment = 0;
+              if (eachMonthData.length > 0) {
+                eachMonthData.forEach((element) => {
+                  totalMonthPayment =
+                    totalMonthPayment + Number(element.fixed) + Number(element.hourly);
+                });
+              }
+              temp.push(totalMonthPayment);
             }
-            temp.push(totalMonthPayment);
+            setSeries([
+              {
+                name: 'Payments(XOF)',
+                data: temp,
+              },
+            ]);
+          } else {
+            setSeries([
+              {
+                name: 'Payments(XOF)',
+                data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+              },
+            ]);
           }
-          setSeries([
-            {
-              name: 'Payments(XOF)',
-              data: temp,
-            },
-          ]);
-        } else {
+        })
+        .catch(() => {
           setSeries([
             {
               name: 'Payments(XOF)',
               data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
             },
           ]);
-        }
-      });
+        });
     }
   }, [selectedDate]);
 
