@@ -293,12 +293,12 @@ class FirebaseService {
         .orderByChild('uid')
         .equalTo(id)
         .on('value', async (snapshot) => {
-          if (snapshot.val() !== null) {
+          if (snapshot.exists()) {
             const dataId = Object.keys(snapshot.val());
-            const userData = snapshot.val()[dataId];
+            const userData = snapshot.val()[dataId[0]];
             const data = new Promise((resolve1) => {
               this.db.ref('tbl_role/roles').on('value', async (snapshot1) => {
-                if (snapshot1.val() !== null) {
+                if (snapshot1.exists()) {
                   const role = snapshot1.val();
                   resolve1(role[userData.role_id]);
                 }
