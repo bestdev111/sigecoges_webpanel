@@ -425,7 +425,7 @@ class FirebaseService {
       return false;
     }
     return new Promise((resolve, reject) => {
-      this.db.ref('tbl_salaryssss').on('value', async (snapshot) => {
+      this.db.ref('tbl_salary').on('value', async (snapshot) => {
         if (snapshot.val() !== null) {
           // eslint-disable-next-line prefer-const
           let temp = [];
