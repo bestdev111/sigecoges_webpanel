@@ -105,6 +105,13 @@ function Widget6(props) {
               data: temp,
             },
           ]);
+        } else {
+          setSeries([
+            {
+              name: 'Payments(XOF)',
+              data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            },
+          ]);
         }
       });
     }
