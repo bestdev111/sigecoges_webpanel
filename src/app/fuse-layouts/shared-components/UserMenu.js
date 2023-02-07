@@ -85,21 +85,19 @@ function UserMenu(props) {
           paper: 'py-8',
         }}
       >
-        {user.role === 'SUPER_ADMIN' ? (
-          <MenuItem
-            component={Link}
-            to="/myprofile"
-            onClick={() => {
-              userMenuClose();
-            }}
-            role="button"
-          >
-            <ListItemIcon className="min-w-40">
-              <Icon>account_circle</Icon>
-            </ListItemIcon>
-            <ListItemText primary="My Profile" />
-          </MenuItem>
-        ) : null}
+        <MenuItem
+          component={Link}
+          to="/myprofile"
+          onClick={() => {
+            userMenuClose();
+          }}
+          role="button"
+        >
+          <ListItemIcon className="min-w-40">
+            <Icon>account_circle</Icon>
+          </ListItemIcon>
+          <ListItemText primary="My Profile" />
+        </MenuItem>
         <MenuItem
           onClick={() => {
             dispatch(logoutUser());

@@ -131,34 +131,64 @@ class FirebaseService {
     }
     if (data) {
       return new Promise((resolve, reject) => {
-        this.db.ref('tbl_admin').once('value', async (snapshot) => {
-          if (snapshot.exists()) {
-            if (snapshot.val().email === data.email) {
-              if (snapshot.val().password.toString() === data.passwordOld.toString()) {
-                await this.db
-                  .ref('tbl_admin')
-                  .update({ email: data.email, password: data.password.toString() })
-                  .then(() => {
-                    console.log('updating...');
-                    this.auth.currentUser
-                      .updatePassword(data.password.toString())
-                      .then((e) => {
-                        console.log('updated!', e);
-                        resolve({ type: 'success', message: 'Successfully changed' });
-                      })
-                      .catch((error) => {
-                        resolve({ type: 'email', message: error.message });
-                      });
-                  })
-                  .catch((err) => resolve({ type: 'email', message: err }));
+        if (data.type === 'super_admin') {
+          this.db.ref('tbl_admin').once('value', async (snapshot) => {
+            if (snapshot.exists()) {
+              if (snapshot.val().email === data.email) {
+                if (snapshot.val().password.toString() === data.passwordOld.toString()) {
+                  await this.db
+                    .ref('tbl_admin')
+                    .update({ password: data.password.toString() })
+                    .then(() => {
+                      this.auth.currentUser
+                        .updatePassword(data.password.toString())
+                        .then((e) => {
+                          resolve({ type: 'success', message: 'Successfully changed' });
+                        })
+                        .catch((error) => {
+                          resolve({ type: 'email', message: error.message });
+                        });
+                    })
+                    .catch((err) => resolve({ type: 'email', message: err }));
+                } else {
+                  resolve({ type: 'passwordOld', message: 'Old password is wrong' });
+                }
               } else {
-                resolve({ type: 'passwordOld', message: 'Old password is wrong' });
+                resolve({ type: 'email', message: 'Email is wrong' });
               }
-            } else {
-              resolve({ type: 'email', message: 'Email is wrong' });
             }
-          }
-        });
+          });
+        } else {
+          this.db
+            .ref('tbl_user')
+            .orderByChild('email')
+            .equalTo(data.email)
+            .once('value', async (snapshot) => {
+              if (snapshot.exists()) {
+                const id = Object.keys(snapshot.val());
+                if (snapshot.val()[id[0]].password.toString() === data.passwordOld.toString()) {
+                  await this.db
+                    .ref(`tbl_user/${id[0]}`)
+                    .update({ password: data.password.toString() })
+                    .then(() => {
+                      this.auth.currentUser
+                        .updatePassword(data.password.toString())
+                        .then(() => {
+                          resolve({ type: 'success', message: 'Successfully changed' });
+                        })
+                        .catch((error) => {
+                          resolve({ type: 'password', message: error.message });
+                        });
+                    })
+                    .catch((err) => resolve({ type: 'email', message: err }));
+                } else {
+                  resolve({ type: 'passwordOld', message: 'Old password is wrong' });
+                }
+              } else {
+                resolve({ type: 'email', message: 'Something went wrong' });
+              }
+            });
+        }
       });
     }
   };

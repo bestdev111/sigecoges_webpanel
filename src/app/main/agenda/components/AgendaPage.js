@@ -103,8 +103,10 @@ const AgendaPage = (props) => {
         FirebaseService.getUserWithEmail(user.email).then((e) => {
           let temp = [];
           events.forEach((element) => {
-            if (allUsers[0][element.uid].group_name === e.group_name) {
-              temp.push(element);
+            if (allUsers && allUsers[0] && allUsers[0][element.uid]) {
+              if (allUsers[0][element.uid].group_name === e.group_name) {
+                temp.push(element);
+              }
             }
           });
           setAgendaData(temp);

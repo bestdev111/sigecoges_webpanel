@@ -5,7 +5,7 @@ const MyProfilePageConfig = {
   settings: {
     layout: {},
   },
-  auth: authRoles.super_admin,
+  auth: authRoles.admin,
   routes: [
     {
       path: '/myprofile',

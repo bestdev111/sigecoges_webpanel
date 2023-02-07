@@ -106,7 +106,7 @@ function EventDialog(props) {
                 ? allUsers.map((user, index) => {
                     if (eventDialog.data.extendedProps.uid === user.id) {
                       return (
-                        <div className="flex">
+                        <div key={index} className="flex">
                           <Avatar className="ml-5" src={user.photo} />
                           <p className="flex items-center ml-5">{user.name}</p>
                         </div>

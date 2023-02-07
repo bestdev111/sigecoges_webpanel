@@ -22,7 +22,7 @@ const schema = yup.object().shape({
     .min(8, 'Password is too short - should be 8 chars minimum.'),
   passwordConfirm: yup.string().oneOf([yup.ref('password'), null], 'Passwords must match'),
 });
-const defaultValues = {
+let defaultValues = {
   email: '',
   passwordOld: '',
   password: '',
@@ -40,11 +40,13 @@ const container = {
 };
 function MyProfilePageContent(props) {
   const dispatch = useDispatch();
+  const [type, setType] = useState();
+  const [userEmail, setUserEmail] = useState();
   const [showOld, setShowOld] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const user = useSelector(({ auth }) => auth.user);
-  const { control, formState, handleSubmit, reset, setError } = useForm({
+  const { control, formState, handleSubmit, reset, setValue, setError } = useForm({
     mode: 'onChange',
     defaultValues,
     resolver: yupResolver(schema),
@@ -54,41 +56,64 @@ function MyProfilePageContent(props) {
 
   useEffect(() => {
     if (user) {
-      if (user.role !== 'SUPER_ADMIN') {
-        window.location.href = '/';
+      if (user.role === 'SUPER_ADMIN') {
+        setType('super_admin');
+        setUserEmail(user.email);
+      } else {
+        setType('admin');
+        setUserEmail(user.email);
       }
+      const {
+        email = '',
+        passwordOld = '',
+        password = '',
+        passwordConfirm = '',
+      } = {
+        email: user.email,
+        passwordOld: '',
+        password: '',
+        passwordConfirm: '',
+      };
+      defaultValues = { email, passwordOld, password, passwordConfirm };
+      _.mapValues(defaultValues, (value, key) => setValue(key, value));
     }
   }, [user]);
 
   function onSubmit(model) {
-    FirebaseService.changeSuperProfile(model).then((result) => {
-      if (result) {
-        if (result.type === 'success') {
-          dispatch(
-            showMessage({
-              message: result.message,
-              autoHideDuration: 5000,
-              anchorOrigin: {
-                vertical: 'top',
-                horizontal: 'right',
-              },
-              variant: 'success',
-            })
-          );
-          reset({
-            email: '',
-            passwordOld: '',
-            password: '',
-            passwordConfirm: '',
-          });
-        } else {
-          setError(result.type, {
-            type: 'manual',
-            message: result.message,
-          });
-        }
+    if (type && userEmail) {
+      model.type = type;
+      model.email = userEmail;
+      if (model && model.type && model.email) {
+        FirebaseService.changeSuperProfile(model).then((result) => {
+          if (result) {
+            if (result.type === 'success') {
+              dispatch(
+                showMessage({
+                  message: result.message,
+                  autoHideDuration: 5000,
+                  anchorOrigin: {
+                    vertical: 'top',
+                    horizontal: 'right',
+                  },
+                  variant: 'success',
+                })
+              );
+              reset({
+                email: '',
+                passwordOld: '',
+                password: '',
+                passwordConfirm: '',
+              });
+            } else {
+              setError(result.type, {
+                type: 'manual',
+                message: result.message,
+              });
+            }
+          }
+        });
       }
-    });
+    }
   }
   if (loading) {
     return <FuseLoading />;
@@ -106,6 +131,7 @@ function MyProfilePageContent(props) {
                   {...field}
                   className="mb-16"
                   type="text"
+                  disabled
                   error={!!errors.email}
                   helperText={errors?.email?.message}
                   label="Email"
