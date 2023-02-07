@@ -37,6 +37,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 import FirebaseService from 'app/services/firebaseService';
 import * as yup from 'yup';
+import { showMessage } from 'app/store/fuse/messageSlice';
 import { getUserAllData, selectAllUsers } from '../store/usersSlice';
 import UsersTableHead from './UsersTableHead';
 
@@ -212,6 +213,7 @@ function UsersTable(props) {
   }
   const handleChange = (event) => {
     setSelectType(event.target.value);
+    setErrorText(false);
   };
   function handleSelectAllClick(event) {
     if (event.target.checked) {
@@ -243,10 +245,9 @@ function UsersTable(props) {
     }
     model.type = selectType;
     if (model && model.phone) {
-      console.log('model===>', model);
       FirebaseService.registerStaff(model).then((result) => {
         if (result) {
-          if (!result.success) {
+          if (result.type !== 'success') {
             setError('phone', {
               type: 'manual',
               message: result.message,
@@ -254,7 +255,17 @@ function UsersTable(props) {
             setSelectType('');
             setErrorText(false);
           } else {
-            console.log('success made!!!!');
+            dispatch(
+              showMessage({
+                message: result.message,
+                autoHideDuration: 5000,
+                anchorOrigin: {
+                  vertical: 'top',
+                  horizontal: 'right',
+                },
+                variant: 'success',
+              })
+            );
             handleClose();
             reset({ phone: '' });
             setSelectType('');
@@ -511,8 +522,8 @@ function UsersTable(props) {
                 type="type"
                 error={!!errors.type}
               >
-                <MenuItem value="">
-                  <em>Please select type</em>
+                <MenuItem value="" disabled>
+                  Please select type
                 </MenuItem>
                 {user.role === 'ADMIN' ? (
                   <MenuItem value="STAFF">Staff</MenuItem>

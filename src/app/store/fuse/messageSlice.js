@@ -5,9 +5,9 @@ const initialState = {
   options: {
     anchorOrigin: {
       vertical: 'top',
-      horizontal: 'center',
+      horizontal: 'right',
     },
-    autoHideDuration: 6000,
+    autoHideDuration: 5000,
     message: 'Hi',
     variant: null,
   },

@@ -11,7 +11,7 @@ import ActivityConfig from 'app/main/activity/ActivityConfig';
 import AgendaConfig from 'app/main/agenda/AgendaConfig';
 import GeofenceConfig from 'app/main/geofence/GeofenceConfig';
 import NewsConfig from 'app/main/news/NewsConfig';
-import RegistrationConfig from 'app/main/registration/RegistrationConfig';
+import MyProfilePageConfig from 'app/main/registration/MyProfilePageConfig';
 import MailConfirmPageConfig from 'app/main/mail-confirm/MailConfirmPageConfig';
 import FuseLoading from '@fuse/core/FuseLoading';
 import Error404Page from 'app/main/404/Error404Page';
@@ -29,7 +29,7 @@ const routeConfigs = [
   AgendaConfig,
   GeofenceConfig,
   NewsConfig,
-  RegistrationConfig,
+  MyProfilePageConfig,
 
   ExampleConfig,
 ];

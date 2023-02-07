@@ -1,14 +1,10 @@
 import FusePageSimple from '@fuse/core/FusePageSimple';
 import { makeStyles } from '@material-ui/core/styles';
 import { Icon, Typography } from '@material-ui/core';
-import withReducer from 'app/store/withReducer';
 import _ from '@lodash';
 import { useEffect, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
 import DashboardContent from './DashboardContent';
-import { getWidgets, selectWidgets } from './store/widgetsSlice';
-import reducer from './store';
 
 const useStyles = makeStyles((theme) => ({
   content: {
@@ -20,20 +16,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function DashboardPage(props) {
-  const dispatch = useDispatch();
-  const widgets = useSelector(selectWidgets);
 
   const classes = useStyles(props);
   const pageLayout = useRef(null);
-
   useEffect(() => {
-    dispatch(getWidgets());
-  }, [dispatch]);
-
-  if (_.isEmpty(widgets)) {
-    return null;
-  }
-
+    if (window.localStorage.hash) {
+      window.localStorage.removeItem('hash');
+    }
+  }, []);
   return (
     <FusePageSimple
       classes={{
@@ -68,4 +58,4 @@ function DashboardPage(props) {
   );
 }
 
-export default withReducer('Dashboard', reducer)(DashboardPage);
+export default DashboardPage;

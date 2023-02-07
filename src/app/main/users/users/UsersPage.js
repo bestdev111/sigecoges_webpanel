@@ -1,17 +1,12 @@
 import FusePageCarded from '@fuse/core/FusePageCarded';
 import withReducer from 'app/store/withReducer';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import reducer from '../store';
 import UsersHeader from './UsersHeader';
 import UsersTable from './UsersTable';
 
 function UsersPage() {
   const [openModal, setOpenModal] = useState(false);
-  useEffect(() => {
-    if (window.localStorage.hash) {
-      window.localStorage.removeItem('hash');
-    }
-  }, []);
   const openModalFunc = (param) => {
     setOpenModal(param);
   };

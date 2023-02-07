@@ -93,20 +93,29 @@ export const registerWithFirebase = (model) => async (dispatch) => {
                 .then((e) => {
                   localStorage.removeItem('mail-confirm');
                   localStorage.removeItem('mailchimp');
-                  const data = { phone, group_name };
-                  firebaseService.registerStaff(data);
-                  firebaseService.getUserWithEmail(e.user.email).then((user) => {
-                    const userData = {
-                      email: user.email,
-                      role: user.type,
-                      photoURL: user.photo,
-                    };
-                    dispatch(setUser(userData));
-                    return dispatch(registerSuccess());
-                  });
+                  const data = { phone, type };
+                  firebaseService
+                    .registerStaff(data)
+                    .then(() => {
+                      firebaseService.getUserWithEmail(e.user.email).then((user) => {
+                        const userData = {
+                          email: user.email,
+                          role: user.type,
+                          photoURL: user.photo,
+                        };
+                        dispatch(setUser(userData));
+                        dispatch(
+                          showMessage({ message: 'Successfully registered', variant: 'success' })
+                        );
+                        return dispatch(registerSuccess());
+                      });
+                    })
+                    .catch(() => {
+                      dispatch(showMessage({ message: 'Rigister Error', variant: 'error' }));
+                    });
                 })
                 .catch((err) => {
-                  console.log('register error', err);
+                  dispatch(showMessage({ message: 'Rigister Error', variant: 'error' }));
                 });
             })
             .catch((error) => {
@@ -126,7 +135,7 @@ export const registerWithFirebase = (model) => async (dispatch) => {
                 });
               }
               if (error.code === 'auth/invalid-api-key') {
-                dispatch(showMessage({ message: error.message }));
+                dispatch(showMessage({ message: error.message, variant: 'error' }));
               }
               return dispatch(registerError(response));
             });
@@ -141,7 +150,6 @@ export const registerWithFirebase = (model) => async (dispatch) => {
           );
         }
       } else {
-        console.log('error');
         const response = [];
         response.push({
           type: 'phone',

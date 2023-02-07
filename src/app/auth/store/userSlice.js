@@ -17,7 +17,8 @@ export const setUserData = (user) => async (dispatch, getState) => {
   /*
     You can redirect the logged-in user to a specific route depending on his role
       */
-  history.location.state = '/user';
+  // history.location.state = '/dashboard';
+  history.location.href = '/dashboard';
   dispatch(setUser(user));
 };
 

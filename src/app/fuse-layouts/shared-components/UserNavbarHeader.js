@@ -52,7 +52,7 @@ function UserNavbarHeader(props) {
       }
       if (user.role === 'SUPER_ADMIN') {
         FirebaseService.db.ref('tbl_admin').on('value', async (snapshot) => {
-          if (snapshot) setName(snapshot.val().name);
+          if (snapshot) setName('Admin');
         });
       }
     }

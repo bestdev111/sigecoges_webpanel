@@ -3,7 +3,6 @@ import Typography from '@material-ui/core/Typography';
 import { memo, useEffect, useState } from 'react';
 import FirebaseService from 'app/services/firebaseService';
 import { useSelector } from 'react-redux';
-import _ from '@lodash';
 
 function Widget2(props) {
   const [totalUserNum, setTotalUserNum] = useState(0);
@@ -15,10 +14,13 @@ function Widget2(props) {
       }
       if (user.role === 'ADMIN') {
         FirebaseService.getUserWithEmail(user.email).then((data) => {
-          const num = _.findIndex(props.allUser, (o) => {
-            return o.group_name === data.group_name;
+          const temp = [];
+          props.allUser.forEach((element) => {
+            if (element.group_name === data.group_name) {
+              temp.push(element);
+            }
           });
-          setTotalUserNum(num);
+          setTotalUserNum(temp.length);
         });
       }
     }

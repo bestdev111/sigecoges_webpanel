@@ -31,7 +31,7 @@ class Auth extends Component {
 
       firebaseService.onAuthStateChanged((authUser) => {
         if (authUser) {
-          this.props.showMessage({ message: 'Logging ...' });
+          // this.props.showMessage({ message: 'Logging ...' });
           /**
            * Retrieve user data from Firebase
            */
@@ -45,7 +45,7 @@ class Auth extends Component {
                 const userData = snapshot.val()[keys[0]];
                 this.props.setUserDataFirebase(userData, authUser);
                 resolve();
-                this.props.showMessage({ message: 'Welcome' });
+                // this.props.showMessage({ message: 'Welcome' });
               }
               resolve();
             });

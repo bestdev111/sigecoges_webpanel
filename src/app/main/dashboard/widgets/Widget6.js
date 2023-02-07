@@ -5,8 +5,8 @@ import { memo, useState, useEffect } from 'react';
 import ReactApexChart from 'react-apexcharts';
 import clsx from 'clsx';
 import { DatePicker } from '@material-ui/pickers';
-import _ from '@lodash';
 import FirebaseService from 'app/services/firebaseService';
+import _ from '@lodash';
 
 const useStyles = makeStyles({
   chart: {
@@ -15,7 +15,7 @@ const useStyles = makeStyles({
   },
 });
 
-function Widget5(props) {
+function Widget6(props) {
   const theme = useTheme();
   const optionsData = {
     chart: {
@@ -41,11 +41,12 @@ function Widget5(props) {
       ],
     },
     yaxis: {
-      labels: {
-        formatter(val) {
-          return val.toFixed(0);
-        },
-      },
+      // title: {
+      //   text: 'XOF',
+      //   rotate: 0,
+      //   offsetX: 1,
+      //   offsetY: 10,
+      // },
     },
     colors: [theme.palette.primary.main, theme.palette.secondary.main],
     fill: {
@@ -74,22 +75,28 @@ function Widget5(props) {
     if (selectedDate) {
       setAwaitRender(false);
       const year = selectedDate.getFullYear();
-      FirebaseService.getUserAllData().then((result) => {
-        if (result) {
+      FirebaseService.getAllSalary().then((salary) => {
+        if (salary) {
           const temp = [];
-          // result.forEach((element) => {});
-          const yearData = _.filter(result, (o) => {
-            return new Date(o.date.time).getFullYear() === year;
+          const yearData = _.filter(salary, (o) => {
+            return o.year === year;
           });
           for (let index = 0; index < 12; index++) {
             const eachMonthData = _.filter(yearData, (o) => {
-              return new Date(o.date.time).getMonth() === index;
+              return new Date(o.created.time).getMonth() === index;
             });
-            temp.push(eachMonthData.length);
+            let totalMonthPayment = 0;
+            if (eachMonthData.length > 0) {
+              eachMonthData.forEach((element) => {
+                totalMonthPayment =
+                  totalMonthPayment + Number(element.fixed) + Number(element.hourly);
+              });
+            }
+            temp.push(totalMonthPayment);
           }
           setSeries([
             {
-              name: 'Users',
+              name: 'Payments(XOF)',
               data: temp,
             },
           ]);
@@ -104,7 +111,7 @@ function Widget5(props) {
   return (
     <Paper className="w-full rounded-20 shadow">
       <div className="flex items-center justify-between p-20">
-        <Typography className="text-16 font-medium">Registered Users</Typography>
+        <Typography className="text-16 font-medium">Payments</Typography>
         <DatePicker
           views={['year']}
           label="Select Year"
@@ -124,4 +131,4 @@ function Widget5(props) {
   );
 }
 
-export default memo(Widget5);
+export default memo(Widget6);

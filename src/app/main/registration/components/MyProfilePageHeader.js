@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Icon, Typography } from '@material-ui/core';
 
-function RegistrationPageHeader() {
+function MyProfilePageHeader() {
   return (
     <div className="flex flex-1 w-full items-center justify-between">
       <div className="flex items-center">
@@ -20,10 +20,10 @@ function RegistrationPageHeader() {
           delay={300}
           className="hidden sm:flex text-16 md:text-24 mx-12 font-semibold"
         >
-          Staff Registration
+          My Profile
         </Typography>
       </div>
     </div>
   );
 }
-export default RegistrationPageHeader;
+export default MyProfilePageHeader;

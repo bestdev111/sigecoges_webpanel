@@ -43,7 +43,6 @@ function FuseMessage(props) {
   const options = useSelector(({ fuse }) => fuse.message.options);
 
   const classes = useStyles();
-
   return (
     <Snackbar
       {...options}

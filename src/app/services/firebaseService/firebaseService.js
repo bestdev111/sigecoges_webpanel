@@ -1,3 +1,4 @@
+/* eslint-disable no-new */
 /* eslint-disable consistent-return */
 /* eslint-disable no-undef */
 /* eslint-disable no-unused-expressions */
@@ -110,11 +111,62 @@ class FirebaseService {
     resolve();
   };
 
+  // getUserWithYear = () => {
+  //   if (!firebase.apps.length) {
+  //     return false;
+  //   }
+  //   return new Promise((resolve, reject) => {
+  //     this.db.ref(`tbl_user`).on('value', async (snapshot) => {
+  //       if (snapshot.exists()) {
+  //         const users = _.toArray(snapshot.val());
+  //         resolve(users);
+  //       }
+  //     });
+  //   });
+  // };
+
+  changeSuperProfile = async (data) => {
+    if (!firebase.apps.length) {
+      return false;
+    }
+    if (data) {
+      return new Promise((resolve, reject) => {
+        this.db.ref('tbl_admin').once('value', async (snapshot) => {
+          if (snapshot.exists()) {
+            if (snapshot.val().email === data.email) {
+              if (snapshot.val().password.toString() === data.passwordOld.toString()) {
+                await this.db
+                  .ref('tbl_admin')
+                  .update({ email: data.email, password: data.password.toString() })
+                  .then(() => {
+                    console.log('updating...');
+                    this.auth.currentUser
+                      .updatePassword(data.password.toString())
+                      .then((e) => {
+                        console.log('updated!', e);
+                        resolve({ type: 'success', message: 'Successfully changed' });
+                      })
+                      .catch((error) => {
+                        resolve({ type: 'email', message: error.message });
+                      });
+                  })
+                  .catch((err) => resolve({ type: 'email', message: err }));
+              } else {
+                resolve({ type: 'passwordOld', message: 'Old password is wrong' });
+              }
+            } else {
+              resolve({ type: 'email', message: 'Email is wrong' });
+            }
+          }
+        });
+      });
+    }
+  };
+
   updateUserData = (user) => {
     if (!firebase.apps.length) {
       return false;
     }
-    console.log('updateUserData===>', user);
     if (user && user.uid) {
       return this.db.ref(`tbl_user/${user.uid}`).push(user);
     }
@@ -148,7 +200,7 @@ class FirebaseService {
         .orderByChild('uid')
         .equalTo(id)
         .on('value', async (snapshot) => {
-          if (snapshot.val() !== null) {
+          if (snapshot.exists()) {
             const result = coreService.getMyReport(snapshot.val(), date);
             if (result.activity === undefined || result.activity === null) {
               reject();
@@ -384,39 +436,34 @@ class FirebaseService {
     });
   };
 
-  registerStaff = (model) => {
+  registerStaff = async (model) => {
     if (!firebase.apps.length) {
       return false;
     }
-    return new Promise((resolve, reject) => {
-      if (model) {
+    if (model) {
+      return new Promise((resolve, reject) => {
         this.db
-          .ref(`tbl_phone_number`)
+          .ref('tbl_phone_number')
           .orderByChild('phone')
           .equalTo(model.phone)
-          .on('value', async (snapshot) => {
-            let temp = null;
+          .once('value', async (snapshot) => {
             if (snapshot.exists()) {
-              console.log(snapshot.val());
-              resolve({ success: false, message: 'The phone number is already used.' });
+              resolve({ type: 'phone', message: 'The phone number is already used.' });
             } else {
-              console.log('No data available');
               const newPostKey = this.db.ref().child('tbl_phone_number').push().key;
-
               this.db
                 .ref(`tbl_phone_number/${newPostKey}`)
                 .set({ phone: model.phone, type: model.type })
                 .then(() => {
-                  console.log('Successfully resolve');
-                  resolve({ success: true, message: 'Successfully created.' });
+                  resolve({ type: 'success', message: 'Successfully registered.' });
                 })
-                .catch((err) =>
-                  resolve({ success: false, message: 'Sorry. Something went wrong' })
-                );
+                .catch((err) => {
+                  resolve({ type: 'phone', message: 'Sorry. Something went wrong' });
+                });
             }
           });
-      }
-    });
+      });
+    }
   };
 }
 

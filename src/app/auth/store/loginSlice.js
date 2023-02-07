@@ -20,15 +20,15 @@ export const submitLoginWithFireBase =
       return () => false;
     }
     firebaseService.db.ref('tbl_admin').on('value', async (snapshot) => {
-      if (snapshot.val() !== null && snapshot.val().email === email) {
+      if (snapshot.exists() && snapshot.val().email === email) {
         if (snapshot.val().password.toString() === password.toString()) {
           firebaseService.auth
             .signInWithEmailAndPassword(email, password)
             .then((e) => {
-              dispatch(showMessage({ message: 'successfully logged' }));
+              dispatch(showMessage({ message: 'successfully logged', variant: 'success' }));
               const userData = {
                 email,
-                role: snapshot.val().type,
+                role: 'SUPER_ADMIN',
               };
               dispatch(setUserData(userData));
               return dispatch(loginSuccess());
@@ -50,7 +50,7 @@ export const submitLoginWithFireBase =
               }
 
               if (error.code === 'auth/invalid-api-key') {
-                dispatch(showMessage({ message: error.message }));
+                dispatch(showMessage({ message: error.message, variant: 'error' }));
               }
 
               return dispatch(loginError(response));
@@ -69,7 +69,7 @@ export const submitLoginWithFireBase =
           .orderByChild('email')
           .equalTo(email)
           .on('value', async (snapshot1) => {
-            if (snapshot1.val() !== null) {
+            if (snapshot1.exists()) {
               const userId = Object.keys(snapshot1.val());
               if (
                 snapshot1.val()[userId] &&
@@ -80,7 +80,7 @@ export const submitLoginWithFireBase =
                   .signInWithEmailAndPassword(email, password)
                   .then((e) => {
                     firebaseService.getUserWithEmail(e.user.email).then((user) => {
-                      dispatch(showMessage({ message: 'successfully logged' }));
+                      dispatch(showMessage({ message: 'successfully logged', variant: 'success' }));
                       const userData = {
                         email: user.email,
                         role: user.type,
@@ -105,7 +105,7 @@ export const submitLoginWithFireBase =
                       });
                     }
                     if (error.code === 'auth/invalid-api-key') {
-                      dispatch(showMessage({ message: error.message }));
+                      dispatch(showMessage({ message: error.message, variant: 'error' }));
                     }
 
                     return dispatch(loginError(response));
