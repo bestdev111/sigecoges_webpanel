@@ -3,7 +3,6 @@ import Typography from '@material-ui/core/Typography';
 import { memo, useState, useEffect } from 'react';
 import FirebaseService from 'app/services/firebaseService';
 import { useSelector } from 'react-redux';
-import _ from '@lodash';
 
 function Widget4() {
   const [totalGeofenceNum, setTotalGeofenceNum] = useState(0);
@@ -18,8 +17,11 @@ function Widget4() {
           }
           if (user.role === 'ADMIN') {
             FirebaseService.getUserWithEmail(user.email).then((data) => {
-              const num = _.findIndex(geofences, (o) => {
-                return o.group_name === data.group_name;
+              let num = 0;
+              geofences.forEach((element) => {
+                if (element.group_name === data.group_name) {
+                  num++;
+                }
               });
               setTotalGeofenceNum(num);
             });
